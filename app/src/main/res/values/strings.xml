@@ -1,3 +1,23 @@
 <resources>
-    <string name="app_name">Hakem-Android-Project</string>
+    <string name="app_name">OnlyPills</string>
+    <string name="title_treatment_screen">Ajout d\'un traitement</string>
+    <string name="title_pill_screen">Ajout d\'un médicament</string>
+    <string name="pills_calendar">Calendrier des médicaments</string>
+    <string name="add_treatment">Ajouter un traitement</string>
+    <string name="add_pill">Ajout d\'un médicament</string>
+    <string name="default_date">17 octobre 2023</string>
+    <string name="default_part_day">Midi</string>
+    <string name="calendar_emoji">📅</string>
+    <string name="end">Fin</string>
+    <string name="date">Date</string>
+    <string name="morning">Matin</string>
+    <string name="noon">Midi</string>
+    <string name="afternoon">Après-midi</string>
+    <string name="taken">Prises</string>
+    <string name="default_duration">Durée par défaut</string>
+    <string name="pill_name">Nom du médicament</string>
+    <string name="validate">Valider</string>
+    <string name="arrow_up">⬆️</string>
+    <string name="days">Jours</string>
+    <string name="arrow_down">⬇️</string>
 </resources>
