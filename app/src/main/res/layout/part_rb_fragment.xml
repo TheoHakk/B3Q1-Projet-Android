@@ -17,32 +17,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <RadioGroup
-        android:layout_width="189dp"
-        android:layout_height="95dp"
-        android:layout_marginStart="24dp"
+    <LinearLayout
+        android:layout_width="277dp"
+        android:layout_height="129dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/TV_title_taken">
 
-        <RadioButton
-            android:id="@+id/RB_morning"
+        <CheckBox
+            android:id="@+id/checkBox3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/morning"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+            android:text="@string/morning" />
 
-        <RadioButton
-            android:id="@+id/RB_noon"
+        <CheckBox
+            android:id="@+id/checkBox4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/noon"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+            android:text="@string/noon" />
 
-        <RadioButton
-            android:id="@+id/RB_afternoon"
+        <CheckBox
+            android:id="@+id/checkBox5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/afternoon"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
-    </RadioGroup>
+            android:text="@string/afternoon" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

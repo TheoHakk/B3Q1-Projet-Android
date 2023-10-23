@@ -65,6 +65,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="388dp"
         android:layout_height="80dp"
         android:layout_marginTop="36dp"
@@ -74,42 +75,30 @@
         app:layout_constraintTop_toBottomOf="@+id/TV_pill_duration">
 
         <Button
-            android:id="@+id/button5"
+            android:id="@+id/B_down_days"
             android:layout_width="52dp"
             android:layout_height="38dp"
+            android:layout_marginEnd="204dp"
             android:layout_weight="1"
             android:text="@string/arrow_down"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/B_up_days"
             app:layout_constraintVertical_bias="0.0"
-            tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteX="125dp" />
+            tools:ignore="MissingConstraints" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/B_up_days"
             android:layout_width="52dp"
             android:layout_height="38dp"
+            android:layout_marginEnd="204dp"
             android:layout_weight="1"
             android:text="@string/arrow_up"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteX="125dp" />
-
-        <NumberPicker
-            android:id="@+id/numberPicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="40dp"
-            android:value="50"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/button4"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            tools:ignore="MissingConstraints" />
 
         <TextView
             android:id="@+id/textView5"
@@ -120,8 +109,30 @@
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/button5"
+            app:layout_constraintHorizontal_bias="0.284"
+            app:layout_constraintStart_toEndOf="@+id/B_down_days"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <NumberPicker
+            android:id="@+id/NP_days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:value="50"
+            app:layout_constraintEnd_toStartOf="@+id/B_up_days"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="0dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/LL_container"
+        android:layout_width="342dp"
+        android:layout_height="221dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/B_pill_validate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"></LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

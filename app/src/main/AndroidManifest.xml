@@ -12,8 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HakemAndroidProject"
         tools:targetApi="31">
+
+        <activity android:name=".controllers.treatment_screen_controller" android:exported="true"></activity>
+        <activity android:name=".controllers.pill_screen_controller" android:exported="true"></activity>
+
+
         <activity
-            android:name=".controllers.pill_screen_controller"
+            android:name=".controllers.MainCalendarActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
