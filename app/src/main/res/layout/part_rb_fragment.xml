@@ -27,8 +27,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/taken"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textSize="20dp" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
 
             <CheckBox
                 android:id="@+id/CB_morning"
@@ -46,7 +48,7 @@
                 android:id="@+id/CB_afternoon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/afternoon" />
+                android:text="@string/evening" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

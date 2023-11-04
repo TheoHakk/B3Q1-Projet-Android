@@ -4,13 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -29,26 +28,22 @@ public class Treatment_screen_controller extends AppCompatActivity {
     TextView endDate;
     Date beginning;
     Date end;
-    LinearLayout mContainer;
     Treatment treatmentToWorkOn;
+    PartOfDay_fragment_controller partOfDayFragment;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_treatment_activity);
         createNewTreatment();
-
         if (getIntent().getExtras() != null) {
             treatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
         }
-
-
         init();
         putFragments();
     }
 
     private void createNewTreatment() {
         //TODO
-
     }
 
     private void init(){
@@ -57,7 +52,6 @@ public class Treatment_screen_controller extends AppCompatActivity {
         beginningDate = findViewById(R.id.TV_beginning_date);
         endDate = findViewById(R.id.TV_end_date);
         addPill = findViewById(R.id.B_add_pill);
-        mContainer = findViewById(R.id.LL_container);
         treatmentValidation = findViewById(R.id.B_treatment_validate);
         setActions();
     }
@@ -89,10 +83,8 @@ public class Treatment_screen_controller extends AppCompatActivity {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @SuppressLint("SetTextI18n")
             @Override
             public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
-                //Il faut gérer la date ici
                 if (Sender.equals("end")) {
                     end = new Date(selectedYear, selectedMonth, selectedDay);
                     endDate.setText(selectedDay + "/" + selectedMonth + "/" + selectedYear);
@@ -105,13 +97,15 @@ public class Treatment_screen_controller extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    private void putFragments(){
-        View partOfDay = getRbFragment();
-        mContainer.addView(partOfDay);
+    private void putFragments() {
+        FragmentManager fm = getSupportFragmentManager();
+        partOfDayFragment = (PartOfDay_fragment_controller) fm.findFragmentById(R.id.fragment_container_treatment);
+        if (partOfDayFragment == null) {
+            partOfDayFragment = new PartOfDay_fragment_controller();
+            fm.beginTransaction()
+                    .add(R.id.fragment_container_treatment, partOfDayFragment)
+                    .commit();
+        }
     }
 
-    private View getRbFragment(){
-        View partOfDay = getLayoutInflater().inflate(R.layout.part_rb_fragment, null);
-        return partOfDay;
-    }
 }

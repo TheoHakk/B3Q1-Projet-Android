@@ -4,7 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
+import android.widget.CheckBox;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -16,9 +17,11 @@ import be.helha.hakem_android_project.models.PartOfDay;
 
 public class PartOfDay_fragment_controller extends Fragment {
 
-    RadioButton morning;
-    RadioButton noon;
-    RadioButton afternoon;
+    CheckBox morning;
+    CheckBox noon;
+    CheckBox afternoon;
+
+    TextView title;
 
 
     @Override
@@ -28,6 +31,7 @@ public class PartOfDay_fragment_controller extends Fragment {
         morning = view.findViewById(R.id.CB_morning);
         noon = view.findViewById(R.id.CB_noon);
         afternoon = view.findViewById(R.id.CB_afternoon);
+        title = view.findViewById(R.id.TV_title_taken);
 
         return view;
     }
