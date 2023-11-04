@@ -4,6 +4,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.List;
+
+import be.helha.hakem_android_project.models.Pill;
+import be.helha.hakem_android_project.models.Treatment;
+
 public class TreatmentBaseHelper extends SQLiteOpenHelper {
     private static final int VERSION = 1; // version de la base de donnée, va servir à savoir s'il faut mettre à jour le code
     private static final String DATABASE_NAME = "db_onlypills.db";
@@ -31,5 +36,11 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 
     }
+
+    public List<Treatment> getTreatments() {
+        //TODO SQL-Request for getting all treatments
+        return null;
+    }
+
 }
 

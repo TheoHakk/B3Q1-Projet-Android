@@ -7,13 +7,14 @@
 
     <TextView
         android:id="@+id/TV_title_calendar"
-        android:layout_width="413dp"
-        android:layout_height="88dp"
+        android:layout_width="358dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="16dp"
         android:text="@string/pills_calendar"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.301"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

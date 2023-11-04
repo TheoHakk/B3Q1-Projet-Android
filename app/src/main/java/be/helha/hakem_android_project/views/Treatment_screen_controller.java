@@ -1,4 +1,4 @@
-package be.helha.hakem_android_project.controllers;
+package be.helha.hakem_android_project.views;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -18,22 +18,37 @@ import java.util.Calendar;
 import java.util.Date;
 
 import be.helha.hakem_android_project.R;
+import be.helha.hakem_android_project.models.Treatment;
 
-public class treatment_screen_controller extends AppCompatActivity {
+public class Treatment_screen_controller extends AppCompatActivity {
     Button openDatePickerButtonBeginning;
     Button openDatePickerButtonEnd;
+    Button treatmentValidation;
     FloatingActionButton addPill;
     TextView beginningDate;
     TextView endDate;
     Date beginning;
     Date end;
     LinearLayout mContainer;
+    Treatment treatmentToWorkOn;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_treatment_activity);
+        createNewTreatment();
+
+        if (getIntent().getExtras() != null) {
+            treatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
+        }
+
+
         init();
         putFragments();
+    }
+
+    private void createNewTreatment() {
+        //TODO
+
     }
 
     private void init(){
@@ -43,6 +58,7 @@ public class treatment_screen_controller extends AppCompatActivity {
         endDate = findViewById(R.id.TV_end_date);
         addPill = findViewById(R.id.B_add_pill);
         mContainer = findViewById(R.id.LL_container);
+        treatmentValidation = findViewById(R.id.B_treatment_validate);
         setActions();
     }
 
@@ -50,12 +66,19 @@ public class treatment_screen_controller extends AppCompatActivity {
         openDatePickerButtonBeginning.setOnClickListener(v -> showDatePickerDialog("beginning"));
         openDatePickerButtonEnd.setOnClickListener(v -> showDatePickerDialog("end"));
         addPill.setOnClickListener(v -> showPillScreen());
+        treatmentValidation.setOnClickListener(v -> registeringTreatment());
     }
 
-
+    private void registeringTreatment() {
+        if(treatmentToWorkOn == null){
+            //TODO
+        }else{
+            //TODO
+        }
+    }
 
     private void showPillScreen() {
-        Intent intent = new Intent(this, pill_screen_controller.class);
+        Intent intent = new Intent(this, Pill_screen_controller.class);
         startActivity(intent);
     }
 
@@ -79,7 +102,6 @@ public class treatment_screen_controller extends AppCompatActivity {
                 }
             }
         }, year, month, day);
-
         datePickerDialog.show();
     }
 
@@ -92,6 +114,4 @@ public class treatment_screen_controller extends AppCompatActivity {
         View partOfDay = getLayoutInflater().inflate(R.layout.part_rb_fragment, null);
         return partOfDay;
     }
-
-
 }
