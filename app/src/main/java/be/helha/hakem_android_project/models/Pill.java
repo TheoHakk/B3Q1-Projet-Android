@@ -8,8 +8,9 @@ public class Pill implements Serializable {
     private String name;
     private int duration;
     private List<PartOfDay> partOfDays;
+    private int id;
 
-    public Pill(String name, int duration , List<PartOfDay> partOfDays) {
+    public Pill(String name, int duration, List<PartOfDay> partOfDays) {
         this.name = name;
         this.duration = duration;
         this.partOfDays = partOfDays;
@@ -38,6 +39,14 @@ public class Pill implements Serializable {
 
     public void setPartOfDays(List<PartOfDay> partOfDays) {
         this.partOfDays = partOfDays;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int setId(int id) {
+        return this.id = id;
     }
 
 

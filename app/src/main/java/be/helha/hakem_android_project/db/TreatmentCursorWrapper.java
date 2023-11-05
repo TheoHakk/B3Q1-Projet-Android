@@ -19,11 +19,11 @@ public class TreatmentCursorWrapper extends CursorWrapper {
     }
 
     public Pill getPill() {
-        String name = getString(getColumnIndex(PillsDbSchema.Pills.Cols.NAME));
-        int duration = getInt(getColumnIndex(PillsDbSchema.Pills.Cols.DURATION));
-        int morning = getInt(getColumnIndex(PillsDbSchema.Pills.Cols.MORNING));
-        int noon = getInt(getColumnIndex(PillsDbSchema.Pills.Cols.NOON));
-        int evening = getInt(getColumnIndex(PillsDbSchema.Pills.Cols.EVENING));
+        String name = getString(getColumnIndex(PillsDbSchema.Cols.NAME));
+        int duration = getInt(getColumnIndex(PillsDbSchema.Cols.DURATION));
+        int morning = getInt(getColumnIndex(PillsDbSchema.Cols.MORNING));
+        int noon = getInt(getColumnIndex(PillsDbSchema.Cols.NOON));
+        int evening = getInt(getColumnIndex(PillsDbSchema.Cols.EVENING));
 
         List<PartOfDay> partOfDays = new ArrayList<>();
 

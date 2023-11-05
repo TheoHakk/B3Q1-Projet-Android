@@ -5,7 +5,7 @@ public abstract class TreatmentDbSchema {
 
     public static final class Cols {
         public static final String ID = "Id";
-        public static final String NAME = "Name";
+        public static final String PILLID = "PillId";
         public static final String BEGINNING = "Beginning";
         public static final String END = "End";
         public static final String MORNING = "Morning";
