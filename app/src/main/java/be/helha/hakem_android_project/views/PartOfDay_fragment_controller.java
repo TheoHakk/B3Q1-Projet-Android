@@ -14,12 +14,13 @@ import java.util.List;
 
 import be.helha.hakem_android_project.R;
 import be.helha.hakem_android_project.models.PartOfDay;
+import be.helha.hakem_android_project.models.Pill;
 
 public class PartOfDay_fragment_controller extends Fragment {
 
     CheckBox morning;
     CheckBox noon;
-    CheckBox afternoon;
+    CheckBox evening;
 
     TextView title;
 
@@ -30,7 +31,7 @@ public class PartOfDay_fragment_controller extends Fragment {
 
         morning = view.findViewById(R.id.CB_morning);
         noon = view.findViewById(R.id.CB_noon);
-        afternoon = view.findViewById(R.id.CB_afternoon);
+        evening = view.findViewById(R.id.CB_afternoon);
         title = view.findViewById(R.id.TV_title_taken);
 
         return view;
@@ -43,7 +44,7 @@ public class PartOfDay_fragment_controller extends Fragment {
             partsOfDay.add(PartOfDay.MORNING);
         if(noon.isChecked())
             partsOfDay.add(PartOfDay.NOON);
-        if(afternoon.isChecked())
+        if(evening.isChecked())
             partsOfDay.add(PartOfDay.EVENING);
         return partsOfDay;
 
@@ -54,4 +55,23 @@ public class PartOfDay_fragment_controller extends Fragment {
     }
 
 
+    public void setCheckBoxState(Pill actualPill) {
+        morning.setChecked(false);
+        noon.setChecked(false);
+        evening.setChecked(false);
+
+        for(PartOfDay partOfDay : actualPill.getPartOfDays()){
+            switch (partOfDay){
+                case MORNING:
+                    morning.setChecked(true);
+                    break;
+                case NOON:
+                    noon.setChecked(true);
+                    break;
+                case EVENING:
+                    evening.setChecked(true);
+                    break;
+            }
+        }
+    }
 }

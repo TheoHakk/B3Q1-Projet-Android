@@ -15,6 +15,7 @@ import java.util.List;
 import be.helha.hakem_android_project.R;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
+import be.helha.hakem_android_project.models.Treatment;
 
 public class Pill_screen_controller extends AppCompatActivity {
 
@@ -24,14 +25,17 @@ public class Pill_screen_controller extends AppCompatActivity {
     TextView tv_duration;
     EditText name;
     int duration;
-
     PartOfDay_fragment_controller partOfDayFragment;
+    Pill pillToWorkOn;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_pill_activity);
+        if (getIntent().getExtras() != null) {
+            pillToWorkOn = (Pill) getIntent().getSerializableExtra("pill");
+        }
         putFragments();
         init();
     }
