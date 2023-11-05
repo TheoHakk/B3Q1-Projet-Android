@@ -184,4 +184,10 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+    @Override
+    protected void onDestroy() {
+        //TODO s'il y a une db, fermer la db
+        super.onDestroy();
+    }
+
 }

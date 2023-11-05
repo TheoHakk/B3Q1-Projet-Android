@@ -4,7 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,16 +55,27 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public List<Treatment> getTreatments(Context context) {
+    public List<Treatment> getTreatments(Context context) throws ParseException {
+        Log.i("Traitement : ", "getTreatments");
+
         List<Treatment> treatments = new ArrayList<>();
 
-        //Obtention d'une référence vers la db
-        SQLiteDatabase db = getReadableDatabase();
         String query = "SELECT * FROM Treatment";
-        //Exécution de la requête
-        Cursor cursor = db.rawQuery(query, null);
+        SQLiteDatabase db;
+        Cursor cursor = null;
+
+        try {
+            //Obtention d'une référence vers la db
+            db = getReadableDatabase();
+            //Exécution de la requête
+            cursor = db.rawQuery(query, null);
+        } catch (Exception e) {
+            Log.i("Traitement : ", "getTreatments : " + e.getMessage());
+        }
+
 
         //Parcours du curseur sur toutes les colonnes
+        assert cursor != null;
         if (cursor.moveToFirst()) {
             do {
                 int pillId = cursor.getInt(cursor.getColumnIndex(TreatmentDbSchema.Cols.PILLID));
@@ -85,17 +98,7 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-                Date beginninOfTreatment = new Date();
-                Date endOfTreament = new Date();
-
-                try {
-                    beginninOfTreatment = dateFormat.parse(beginning);
-                    endOfTreament = dateFormat.parse(end);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                Treatment treatment = new Treatment(pill, partsOfDay, beginninOfTreatment, endOfTreament);
+                Treatment treatment = new Treatment(pill, partsOfDay, dateFormat.parse(beginning), dateFormat.parse(end));
 
                 treatments.add(treatment);
             } while (cursor.moveToNext());
@@ -140,12 +143,9 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
                 evening + ");";
 
 
-        try {
-            db.execSQL(query);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        db.execSQL(query);
     }
+
 
 }
 
