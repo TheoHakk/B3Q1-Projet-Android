@@ -25,31 +25,32 @@ public class Calendar_screen_controller extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_activity);
-        init();
+        try {
+            init();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void init() {
-        Thread thread = new Thread(() -> {
-            treatmentBaseHelper = new TreatmentBaseHelper(this);
-            try {
-                //TODO C'est ici mon soucis !
-                treatmentList = treatmentBaseHelper.getTreatments(this);
-                Log.i("Traitement : ", "C'est ok !");
-
-                while(treatmentList.isEmpty())
-                    Thread.sleep(1000);
-
-                for(Treatment t : treatmentList)
-                    Log.i("Traitement : ", t.toString());
-
-            } catch (Exception e) {
-                Log.i("Traitement : ", "C'est pas ok !");
-                e.printStackTrace();
-            }
-        });
-        thread.start();
+    private void init() throws ParseException {
+        getTreatments();
         addTreatment = findViewById(R.id.FB_add_treatment);
         setActions();
+    }
+
+    private void getTreatments() {
+        treatmentBaseHelper = new TreatmentBaseHelper(this);
+        try {
+            treatmentList = treatmentBaseHelper.getTreatments(this);
+            Log.i("Traitement : ", "C'est ok !");
+
+            for(Treatment t : treatmentList)
+                Log.i("Traitement : ", t.getPill().getName());
+
+        } catch (Exception e) {
+            Log.i("Traitement : ", "C'est pas ok !");
+            e.printStackTrace();
+        }
     }
 
     private void setActions() {
