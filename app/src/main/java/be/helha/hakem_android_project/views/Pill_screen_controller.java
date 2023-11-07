@@ -10,12 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 
-import java.util.List;
-
 import be.helha.hakem_android_project.R;
-import be.helha.hakem_android_project.models.PartOfDay;
+import be.helha.hakem_android_project.db.PillsBaseHelper;
 import be.helha.hakem_android_project.models.Pill;
-import be.helha.hakem_android_project.models.Treatment;
 
 public class Pill_screen_controller extends AppCompatActivity {
 
@@ -33,11 +30,35 @@ public class Pill_screen_controller extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_pill_activity);
-        if (getIntent().getExtras() != null) {
-            pillToWorkOn = (Pill) getIntent().getSerializableExtra("pill");
-        }
-        putFragments();
         init();
+        putFragments();
+        verifyIntent();
+    }
+
+    private void verifyIntent() {
+        if (getIntent().getExtras() != null)
+            pillToWorkOn = (Pill) getIntent().getSerializableExtra("pill");
+        if (pillToWorkOn != null)
+            showPillInformations();
+    }
+
+    private void showPillInformations() {
+        name.setText(pillToWorkOn.getName());
+        duration = pillToWorkOn.getDuration();
+        tv_duration.setText(String.valueOf(pillToWorkOn.getDuration()));
+
+        //Because of the fragment commit, we need to wait the fragment has instantiate its views
+        Thread thread = new Thread(() -> {
+            while (!partOfDayFragment.checkBoxState()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            partOfDayFragment.setCheckBoxState(pillToWorkOn);
+        });
+        thread.start();
     }
 
     private void init() {
@@ -49,7 +70,16 @@ public class Pill_screen_controller extends AppCompatActivity {
         name = findViewById(R.id.E_pill_name);
         setActions();
     }
-
+    private void putFragments() {
+        FragmentManager fm = getSupportFragmentManager();
+        partOfDayFragment = (PartOfDay_fragment_controller) fm.findFragmentById(R.id.fragment_container);
+        if (partOfDayFragment == null) {
+            partOfDayFragment = new PartOfDay_fragment_controller();
+            fm.beginTransaction()
+                    .add(R.id.fragment_container, partOfDayFragment)
+                    .commit();
+        }
+    }
     private void setActions() {
         upDays.setOnClickListener(v -> {
             if (duration < 30)
@@ -61,12 +91,15 @@ public class Pill_screen_controller extends AppCompatActivity {
                 duration--;
             tv_duration.setText(String.valueOf(duration));
         });
-        validate.setOnClickListener(v -> {
-            validatePill();
-        });
+        validate.setOnClickListener(v -> validatePill());
     }
-
     private void validatePill() {
+        if(pillToWorkOn != null)
+            updatePill();
+        else
+            createNewPill();
+    }
+    private void createNewPill() {
         Pill pill = null;
         try {
             if (name.getText().toString().isEmpty() || duration == 0)
@@ -77,22 +110,32 @@ public class Pill_screen_controller extends AppCompatActivity {
             Log.i("ERROR", "validatePill: " + e.getMessage());
             e.getStackTrace();
         }
-        if (pill != null)
-            Log.i("Pill", "Name : " + pill.getName() + " , Duration : " + pill.getDuration() + " , Parts of day : " + pill.getPartsOfDay());
+        if (pill != null){
+            Log.i("Pill", "Name : " + pill.getName() + " , Duration : " + pill.getDuration() + " , Parts of day : " + pill.getStringPartsOfDay());
+            PillsBaseHelper pillsBaseHelper = new PillsBaseHelper(this);
+            try {
+                pillsBaseHelper.insertPill(pill);
+            } catch (Exception e) {
+                Log.i("ERROR", "validatePill: " + e.getMessage());
+            }
+        }
         else Log.i("Pill", "Pill is null");
+
     }
 
-
-    private void putFragments() {
-        FragmentManager fm = getSupportFragmentManager();
-        partOfDayFragment = (PartOfDay_fragment_controller) fm.findFragmentById(R.id.fragment_container);
-        if (partOfDayFragment == null) {
-            partOfDayFragment = new PartOfDay_fragment_controller();
-            fm.beginTransaction()
-                    .add(R.id.fragment_container, partOfDayFragment)
-                    .commit();
+    private void updatePill() {
+        PillsBaseHelper pillsBaseHelper = new PillsBaseHelper(this);
+        try {
+            Log.i("Lecture ", "validatePill: " + name.getText().toString() + " , " + duration + " , " + partOfDayFragment.getPartsOfDay());
+            pillToWorkOn.setName(name.getText().toString());
+            pillToWorkOn.setDuration(duration);
+            pillToWorkOn.setPartOfDays(partOfDayFragment.getPartsOfDay());
+            pillsBaseHelper.updatePill(pillToWorkOn);
+        } catch (Exception e) {
+            Log.i("ERROR", "updatePill: " + e.getMessage());
         }
     }
+
 
     @Override
     protected void onDestroy() {

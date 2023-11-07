@@ -38,11 +38,11 @@
         android:id="@+id/B_add_pill"
         android:layout_width="62dp"
         android:layout_height="55dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="36dp"
         android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.573"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/SP_pills_items"
         app:layout_constraintTop_toBottomOf="@+id/TV_pill"
         app:srcCompat="@android:drawable/ic_input_add" />
@@ -51,8 +51,8 @@
         android:id="@+id/SP_pills_items"
         android:layout_width="178dp"
         android:layout_height="26dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/TV_pill" />
 
@@ -178,6 +178,27 @@
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintVertical_bias="0.034"
         tools:layout_editor_absoluteX="19dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/B_modify_pill"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:clickable="true"
+        app:layout_constraintStart_toEndOf="@+id/B_add_pill"
+        app:layout_constraintTop_toBottomOf="@+id/TV_pill"
+        app:srcCompat="@android:drawable/ic_menu_manage" />
+
+    <TextView
+        android:id="@+id/TV_recommanded_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/recommanded_duration"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/SP_pills_items" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

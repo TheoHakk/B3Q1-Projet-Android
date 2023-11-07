@@ -9,6 +9,7 @@ import android.util.Log;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -73,18 +74,16 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
             Log.i("Traitement : ", "getTreatments : " + e.getMessage());
         }
 
-
         //Parcours du curseur sur toutes les colonnes
         assert cursor != null;
         if (cursor.moveToFirst()) {
             do {
                 int pillId = cursor.getInt(cursor.getColumnIndex(TreatmentDbSchema.Cols.PILLID));
-                String beginning = cursor.getString(cursor.getColumnIndex(TreatmentDbSchema.Cols.BEGINNING));
-                String end = cursor.getString(cursor.getColumnIndex(TreatmentDbSchema.Cols.END));
+                String beginningString = cursor.getString(cursor.getColumnIndex(TreatmentDbSchema.Cols.BEGINNING));
+                String endString = cursor.getString(cursor.getColumnIndex(TreatmentDbSchema.Cols.END));
                 int morning = cursor.getInt(cursor.getColumnIndex(TreatmentDbSchema.Cols.MORNING));
                 int noon = cursor.getInt(cursor.getColumnIndex(TreatmentDbSchema.Cols.NOON));
                 int evening = cursor.getInt(cursor.getColumnIndex(TreatmentDbSchema.Cols.EVENING));
-
 
                 Pill pill = new PillsBaseHelper(context).getSpecificPill(pillId);
                 List<PartOfDay> partsOfDay = new ArrayList<>();
@@ -98,14 +97,23 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-                Treatment treatment = new Treatment(pill, partsOfDay, dateFormat.parse(beginning), dateFormat.parse(end));
+                Calendar beginning = Calendar.getInstance();
+                Calendar end = Calendar.getInstance();
+
+                // Convertir les dates en objets Calendar
+                beginning.setTime(dateFormat.parse(beginningString));
+                end.setTime(dateFormat.parse(endString));
+
+                Treatment treatment = new Treatment(pill, partsOfDay, beginning, end);
 
                 treatments.add(treatment);
             } while (cursor.moveToNext());
         }
+
         cursor.close();
         return treatments;
     }
+
 
     public void addTreatment(Treatment treatment) {
         //Obtention d'une référence vers la db

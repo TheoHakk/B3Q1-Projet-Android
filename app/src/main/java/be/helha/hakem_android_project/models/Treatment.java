@@ -1,6 +1,7 @@
 package be.helha.hakem_android_project.models;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -8,10 +9,10 @@ public class Treatment implements Serializable {
 
     private Pill pill;
     private List<PartOfDay> partOfDays;
-    private Date beginning;
-    private Date end;
+    private Calendar beginning;
+    private Calendar end;
 
-    public Treatment(Pill pill, List<PartOfDay> partOfDays, Date beginning, Date end) {
+    public Treatment(Pill pill, List<PartOfDay> partOfDays, Calendar beginning, Calendar end) {
         this.pill = pill;
         this.partOfDays = partOfDays;
         this.beginning = beginning;
@@ -26,11 +27,11 @@ public class Treatment implements Serializable {
         this.partOfDays = partOfDays;
     }
 
-    public void setBeginning(Date beginning) {
+    public void setBeginning(Calendar beginning) {
         this.beginning = beginning;
     }
 
-    public void setEnd(Date end) {
+    public void setEnd(Calendar end) {
         this.end = end;
     }
 
@@ -42,11 +43,11 @@ public class Treatment implements Serializable {
         return partOfDays;
     }
 
-    public Date getBeginning() {
+    public Calendar getBeginning() {
         return beginning;
     }
 
-    public Date getEnd() {
+    public Calendar getEnd() {
         return end;
     }
 

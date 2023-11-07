@@ -47,15 +47,21 @@ public class PartOfDay_fragment_controller extends Fragment {
         if(evening.isChecked())
             partsOfDay.add(PartOfDay.EVENING);
         return partsOfDay;
-
     }
 
     public PartOfDay_fragment_controller() {
         super(R.layout.part_of_day_fragment);
     }
 
+    public boolean checkBoxState() {
+        if(morning == null || noon == null || evening == null)
+            return false;
+        return true;
+    }
+
 
     public void setCheckBoxState(Pill actualPill) {
+
         morning.setChecked(false);
         noon.setChecked(false);
         evening.setChecked(false);

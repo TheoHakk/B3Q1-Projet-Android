@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,86 @@ public class PillsBaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public void insertPill(Pill pill){
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "INSERT INTO Pills (Name, Duration, Morning, Noon, Evening) VALUES (?, ?, ?, ?, ?)";
+
+
+        String[] args = {
+                pill.getName(),
+                String.valueOf(pill.getDuration()),
+                String.valueOf(pill.getPartOfDays().contains(PartOfDay.MORNING) ? 1 : 0),
+                String.valueOf(pill.getPartOfDays().contains(PartOfDay.NOON) ? 1 : 0),
+                String.valueOf(pill.getPartOfDays().contains(PartOfDay.EVENING) ? 1 : 0)};
+        db.execSQL(query, args);
+    }
+
+    public void updatePill(Pill pill) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "UPDATE Pills SET Name = ?, Duration = ?, Morning = ?, Noon = ?, Evening = ? WHERE Id = ?";
+        String[] args = {
+                pill.getName(),
+                String.valueOf(pill.getDuration()),
+                String.valueOf(pill.getPartOfDays().contains(PartOfDay.MORNING) ? 1 : 0),
+                String.valueOf(pill.getPartOfDays().contains(PartOfDay.NOON) ? 1 : 0),
+                String.valueOf(pill.getPartOfDays().contains(PartOfDay.EVENING) ? 1 : 0),
+                String.valueOf(pill.getId())};
+        try {
+            db.execSQL(query, args);
+        } catch (Exception e) {
+            Log.i("ERROR", "updatePill: " + e.getMessage());
+        }
+    }
+
+
+    public List<Pill> getPills(){
+
+        List<Pill> pills = new ArrayList<>();
+
+        String query = "SELECT * FROM Pills";
+        SQLiteDatabase db;
+        Cursor cursor = null;
+
+        try {
+            //Obtention d'une référence vers la db
+            db = getReadableDatabase();
+            //Exécution de la requête
+            cursor = db.rawQuery(query, null);
+        } catch (Exception e) {
+            Log.i("Traitement : ", "getPills : " + e.getMessage());
+        }
+
+
+        //Parcours du curseur sur toutes les colonnes
+        assert cursor != null;
+        if (cursor.moveToFirst()) {
+            do {
+                int pillId = cursor.getInt(cursor.getColumnIndex(PillsDbSchema.Cols.ID));
+                String pillName = cursor.getString(cursor.getColumnIndex(PillsDbSchema.Cols.NAME));
+                int duration = cursor.getInt(cursor.getColumnIndex(PillsDbSchema.Cols.DURATION));
+                int morning = cursor.getInt(cursor.getColumnIndex(PillsDbSchema.Cols.MORNING));
+                int noon = cursor.getInt(cursor.getColumnIndex(PillsDbSchema.Cols.NOON));
+                int evening = cursor.getInt(cursor.getColumnIndex(PillsDbSchema.Cols.EVENING));
+
+                List<PartOfDay> partsOfDay = new ArrayList<>();
+
+                if (morning == 1)
+                    partsOfDay.add(PartOfDay.MORNING);
+                if (noon == 1)
+                    partsOfDay.add(PartOfDay.NOON);
+                if (evening == 1)
+                    partsOfDay.add(PartOfDay.EVENING);
+
+                Pill pill = new Pill(pillName, duration, partsOfDay);
+
+                pill.setId(pillId);
+
+                pills.add(pill);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return pills;
+    }
     public Pill getSpecificPill(int id){
         Pill pill = null;
 

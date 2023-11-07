@@ -50,7 +50,7 @@ public class Pill implements Serializable {
     }
 
 
-    public String getPartsOfDay() {
+    public String getStringPartsOfDay() {
         String partsOfDay = "";
         for (PartOfDay partOfDay : this.partOfDays) {
             partsOfDay += partOfDay.toString() + " ";
