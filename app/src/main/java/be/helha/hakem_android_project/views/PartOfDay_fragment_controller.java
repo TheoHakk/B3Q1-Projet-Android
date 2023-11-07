@@ -80,4 +80,25 @@ public class PartOfDay_fragment_controller extends Fragment {
             }
         }
     }
+
+    public void setCheckBoxState(List<PartOfDay> partsOfDay) {
+
+        morning.setChecked(false);
+        noon.setChecked(false);
+        evening.setChecked(false);
+
+        for(PartOfDay partOfDay : partsOfDay){
+            switch (partOfDay){
+                case MORNING:
+                    morning.setChecked(true);
+                    break;
+                case NOON:
+                    noon.setChecked(true);
+                    break;
+                case EVENING:
+                    evening.setChecked(true);
+                    break;
+            }
+        }
+    }
 }

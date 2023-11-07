@@ -46,4 +46,15 @@ public class DayOfTreatment {
         return treatsForEvening;
     }
 
+    public boolean hasTreatment() {
+        return !treatsForEvening.isEmpty() || !treatsForMorning.isEmpty() || !treatsForNoon.isEmpty();
+    }
+
+    public String getDateString() {
+        int day = date.get(Calendar.DAY_OF_MONTH);
+        int month = date.get(Calendar.MONTH) + 1; //We add 1 for getting the real month
+        int year = date.get(Calendar.YEAR);
+        return day + "/" + month + "/" + year;
+    }
+
 }

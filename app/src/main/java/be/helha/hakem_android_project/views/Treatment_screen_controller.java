@@ -51,12 +51,17 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_treatment_activity);
-        if (getIntent().getExtras() != null)
-            treatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
-        if (treatmentToWorkOn != null) showTreatmentInformations();
 
         init();
         putFragments();
+        verifyIntent();
+    }
+
+    private void verifyIntent() {
+        if (getIntent().getExtras() != null)
+            treatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
+        if (treatmentToWorkOn != null)
+            showTreatmentInformations();
     }
 
     private void showTreatmentInformations() {
@@ -67,6 +72,20 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
         beginningDate.setText(beginning.get(Calendar.DAY_OF_MONTH) + "/" + (beginning.get(Calendar.MONTH) + 1) + "/" + beginning.get(Calendar.YEAR));
         endDate.setText(end.get(Calendar.DAY_OF_MONTH) + "/" + (end.get(Calendar.MONTH) + 1) + "/" + end.get(Calendar.YEAR));
         recommanded_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + actualPill.getDuration() + " jours");
+
+        pillSpinner.setSelection(actualPill.getId() - 1);
+        //Because of the fragment commit, we need to wait the fragment has instantiate its views
+        Thread thread = new Thread(() -> {
+            while (!partOfDayFragment.checkBoxState()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            partOfDayFragment.setCheckBoxState(treatmentToWorkOn.getPartsOfDay());
+        });
+        thread.start();
     }
 
     private void createNewTreatment() {

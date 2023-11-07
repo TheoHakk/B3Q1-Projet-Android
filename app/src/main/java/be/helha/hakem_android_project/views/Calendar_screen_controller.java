@@ -3,6 +3,9 @@ package be.helha.hakem_android_project.views;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,6 +28,7 @@ public class Calendar_screen_controller extends AppCompatActivity {
     TreatmentBaseHelper treatmentBaseHelper;
     List<Treatment> treatmentList;
     List<DayOfTreatment> calendar;
+    LinearLayout mContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +44,74 @@ public class Calendar_screen_controller extends AppCompatActivity {
     private void init() throws ParseException {
         getTreatments();
         addTreatment = findViewById(R.id.FB_add_treatment);
-        initializeCalendar();
+        mContainer = findViewById(R.id.dayOfTreatmentList);
 
+        initializeCalendar();
+        updateUI();
         setActions();
     }
+
+
+    private void updateUI() {
+        mContainer.removeAllViews();
+        try {
+            for (final DayOfTreatment day : calendar) {
+                if (day.hasTreatment()) {
+                    TextView tv = new TextView(getApplicationContext());
+                    tv.setPadding(20, 0, 0, 10);
+                    tv.setText(day.getDateString());
+                    mContainer.addView(tv);
+
+                    TextView tv2 = new TextView(getApplicationContext());
+                    tv2.setPadding(50, 0, 0, 0);
+                    if (!day.getTreatsForMorning().isEmpty())
+                        tv2.setText("Morning : ");
+                    mContainer.addView(tv2);
+
+                    for (Treatment t : day.getTreatsForMorning()) {
+                        TextView textView = new TextView(getApplicationContext());
+                        textView.setOnClickListener(v -> showTreatmentScreen(t));
+                        textView.setPadding(75, 0, 0, 0);
+                        textView.setText(t.getPill().getName());
+                        mContainer.addView(textView);
+                    }
+
+                    TextView tv3 = new TextView(getApplicationContext());
+                    tv3.setPadding(50, 0, 0, 0);
+                    if (!day.getTreatsForNoon().isEmpty())
+                        tv3.setText("Noon : ");
+                    mContainer.addView(tv3);
+
+                    for (Treatment t : day.getTreatsForNoon()) {
+                        TextView textView = new TextView(getApplicationContext());
+                        textView.setOnClickListener(v -> showTreatmentScreen(t));
+                        textView.setPadding(75, 0, 0, 0);
+                        textView.setText(t.getPill().getName());
+                        mContainer.addView(textView);
+                    }
+
+                    TextView tv4 = new TextView(getApplicationContext());
+                    tv4.setPadding(50, 0, 0, 0);
+                    if (!day.getTreatsForEvening().isEmpty())
+                        tv4.setText("Evening : ");
+                    mContainer.addView(tv4);
+
+                    for (Treatment t : day.getTreatsForEvening()) {
+                        TextView textView = new TextView(getApplicationContext());
+                        textView.setOnClickListener(v -> showTreatmentScreen(t));
+                        textView.setPadding(75, 0, 0, 0);
+                        textView.setText(t.getPill().getName());
+                        mContainer.addView(textView);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.i("ALERT", "updateUI: " + e.getMessage());
+        }
+    }
+
+
+
 
     private void initializeCalendar() {
         calendar = new ArrayList<>();
@@ -84,11 +152,14 @@ public class Calendar_screen_controller extends AppCompatActivity {
     }
 
     private void setActions() {
-        addTreatment.setOnClickListener(v -> showTreatmentScreen());
+        addTreatment.setOnClickListener(v -> showTreatmentScreen(null));
     }
 
-    private void showTreatmentScreen() {
+    private void showTreatmentScreen(Treatment treatment) {
         Intent intent = new Intent(this, Treatment_screen_controller.class);
+        if (treatment != null)
+            intent.putExtra("treatment", treatment);
+
         startActivity(intent);
     }
 
