@@ -20,12 +20,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 import be.helha.hakem_android_project.R;
 import be.helha.hakem_android_project.db.PillsBaseHelper;
+import be.helha.hakem_android_project.db.TreatmentBaseHelper;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
 import be.helha.hakem_android_project.models.Treatment;
@@ -51,14 +51,37 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_treatment_activity);
-        if (getIntent().getExtras() != null) {
+        if (getIntent().getExtras() != null)
             treatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
-        }
+        if (treatmentToWorkOn != null) showTreatmentInformations();
+
         init();
         putFragments();
     }
 
+    private void showTreatmentInformations() {
+        beginning = treatmentToWorkOn.getBeginning();
+        end = treatmentToWorkOn.getEnd();
+        actualPill = treatmentToWorkOn.getPill();
+        duration = actualPill.getDuration();
+        beginningDate.setText(beginning.get(Calendar.DAY_OF_MONTH) + "/" + (beginning.get(Calendar.MONTH) + 1) + "/" + beginning.get(Calendar.YEAR));
+        endDate.setText(end.get(Calendar.DAY_OF_MONTH) + "/" + (end.get(Calendar.MONTH) + 1) + "/" + end.get(Calendar.YEAR));
+        recommanded_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + actualPill.getDuration() + " jours");
+    }
+
     private void createNewTreatment() {
+        Treatment treatmentToInsert = getCurrentTreatment();
+        if (treatmentToInsert != null) {
+            if (treatmentToWorkOn != null)
+                updateTreatment(treatmentToInsert);
+            else
+                insertNewTreatment(treatmentToInsert);
+        } else
+            Toast.makeText(getApplicationContext(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
+    }
+
+    private Treatment getCurrentTreatment() {
+        Treatment treatmentToInsert = null;
         try {
             Pill actualPill = (Pill) pillSpinner.getSelectedItem();
             List<PartOfDay> partsOfDay = partOfDayFragment.getPartsOfDay();
@@ -70,14 +93,26 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
                     && end != null
                     && end.after(beginning)
                     && !partsOfDay.isEmpty())
-                treatmentToWorkOn = new Treatment(actualPill, partOfDayFragment.getPartsOfDay(), beginning, end);
-            else {
-                treatmentToWorkOn = null;
-                Toast.makeText(getApplicationContext(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
-            }
+                treatmentToInsert = new Treatment(actualPill, partOfDayFragment.getPartsOfDay(), beginning, end);
         } catch (Exception e) {
             Log.i("Error", Objects.requireNonNull(e.getMessage()));
         }
+        return treatmentToInsert;
+    }
+
+    private void insertNewTreatment(Treatment currentTreatment) {
+        TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
+        treatmentBaseHelper.insertTreatment(currentTreatment);
+    }
+
+    private void updateTreatment(Treatment currentTreatment) {
+        TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
+        treatmentToWorkOn.setBeginning(currentTreatment.getBeginning());
+        treatmentToWorkOn.setEnd(currentTreatment.getEnd());
+        treatmentToWorkOn.setPill(currentTreatment.getPill());
+        treatmentToWorkOn.setPartsOfDay(currentTreatment.getPartsOfDay());
+
+        treatmentBaseHelper.updateTreatment(treatmentToWorkOn);
     }
 
     private void init() {
@@ -173,7 +208,6 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
         }, year, month, day);
         datePickerDialog.show();
     }
-
 
 
     private void putFragments() {

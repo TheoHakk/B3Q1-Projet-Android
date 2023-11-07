@@ -2,29 +2,35 @@ package be.helha.hakem_android_project.models;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class Treatment implements Serializable {
 
+    private int id;
     private Pill pill;
-    private List<PartOfDay> partOfDays;
+    private List<PartOfDay> partsOfDay;
     private Calendar beginning;
     private Calendar end;
 
-    public Treatment(Pill pill, List<PartOfDay> partOfDays, Calendar beginning, Calendar end) {
+    public Treatment(Pill pill, List<PartOfDay> partsOfDay, Calendar beginning, Calendar end) {
         this.pill = pill;
-        this.partOfDays = partOfDays;
+        this.partsOfDay = partsOfDay;
         this.beginning = beginning;
         this.end = end;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+    public int getId(){
+        return this.id;
+    }
     public void setPill(Pill pill) {
         this.pill = pill;
     }
 
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
+    public void setPartsOfDay(List<PartOfDay> partsOfDay) {
+        this.partsOfDay = partsOfDay;
     }
 
     public void setBeginning(Calendar beginning) {
@@ -39,19 +45,21 @@ public class Treatment implements Serializable {
         return pill;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
+    public List<PartOfDay> getPartsOfDay() {
+        return partsOfDay;
     }
 
     public Calendar getBeginning() {
         return beginning;
     }
-
     public Calendar getEnd() {
         return end;
     }
-
-
-
+    public String getBeginningString() {
+        return beginning.get(Calendar.DAY_OF_MONTH) + "/" + beginning.get(Calendar.MONTH) + "/" + beginning.get(Calendar.YEAR);
+    }
+    public String getEndString() {
+        return end.get(Calendar.DAY_OF_MONTH) + "/" + end.get(Calendar.MONTH) + "/" + end.get(Calendar.YEAR);
+    }
 
 }

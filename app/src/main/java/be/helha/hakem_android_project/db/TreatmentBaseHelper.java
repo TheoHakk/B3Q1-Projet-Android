@@ -15,7 +15,6 @@ import java.util.List;
 
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
-import be.helha.hakem_android_project.models.PillsDbSchema;
 import be.helha.hakem_android_project.models.Treatment;
 import be.helha.hakem_android_project.models.TreatmentDbSchema;
 
@@ -78,6 +77,7 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
         assert cursor != null;
         if (cursor.moveToFirst()) {
             do {
+                int id = cursor.getInt(cursor.getColumnIndex(TreatmentDbSchema.Cols.ID));
                 int pillId = cursor.getInt(cursor.getColumnIndex(TreatmentDbSchema.Cols.PILLID));
                 String beginningString = cursor.getString(cursor.getColumnIndex(TreatmentDbSchema.Cols.BEGINNING));
                 String endString = cursor.getString(cursor.getColumnIndex(TreatmentDbSchema.Cols.END));
@@ -95,16 +95,12 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
                 if (evening == 1)
                     partsOfDay.add(PartOfDay.EVENING);
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-                Calendar beginning = Calendar.getInstance();
-                Calendar end = Calendar.getInstance();
-
-                // Convertir les dates en objets Calendar
-                beginning.setTime(dateFormat.parse(beginningString));
-                end.setTime(dateFormat.parse(endString));
+                Calendar beginning = convertStringToCalendar(beginningString);
+                Calendar end = convertStringToCalendar(endString);
 
                 Treatment treatment = new Treatment(pill, partsOfDay, beginning, end);
+                treatment.setId(id);
 
                 treatments.add(treatment);
             } while (cursor.moveToNext());
@@ -114,46 +110,50 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
         return treatments;
     }
 
-
-    public void addTreatment(Treatment treatment) {
-        //Obtention d'une référence vers la db
-        SQLiteDatabase db = getWritableDatabase();
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-        String beginning = dateFormat.format(treatment.getBeginning());
-        String end = dateFormat.format(treatment.getEnd());
-
-        int morning = 0;
-        int noon = 0;
-        int evening = 0;
-
-        for (PartOfDay partOfDay : treatment.getPartOfDays()) {
-            switch (partOfDay) {
-                case MORNING:
-                    morning = 1;
-                    break;
-                case NOON:
-                    noon = 1;
-                    break;
-                case EVENING:
-                    evening = 1;
-                    break;
-            }
-        }
-
-        String query = "INSERT INTO Treatment (PillId, Begining, End, Morning, Noon, Evening) VALUES (" +
-                treatment.getPill().getId() + ", '" +
-                beginning + "', '" +
-                end + "', " +
-                morning + ", " +
-                noon + ", " +
-                evening + ");";
-
-
-        db.execSQL(query);
+    private Calendar convertStringToCalendar(String dateString) throws ParseException {
+        //We need to convert the string to a usable calendar
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = sdf.parse(dateString);
+        calendar.setTime(date);
+        return calendar;
     }
 
 
+
+    public void insertTreatment(Treatment currentTreatment) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "INSERT INTO Treatment (PillId, Beginning, End, Morning, Noon, Evening) VALUES (?, ?, ?, ?, ?, ?)";
+        String[] args = {
+                String.valueOf(currentTreatment.getPill().getId()),
+                String.valueOf(currentTreatment.getBeginningString()),
+                String.valueOf(currentTreatment.getEndString()),
+                String.valueOf(currentTreatment.getPartsOfDay().contains(PartOfDay.MORNING) ? 1 : 0),
+                String.valueOf(currentTreatment.getPartsOfDay().contains(PartOfDay.NOON) ? 1 : 0),
+                String.valueOf(currentTreatment.getPartsOfDay().contains(PartOfDay.EVENING) ? 1 : 0)};
+        try {
+            db.execSQL(query, args);
+        } catch (Exception e) {
+            Log.i("Traitement : ", "insertTreatment : " + e.getMessage());
+        }
+    }
+
+    public void updateTreatment(Treatment treatmentToWorkOn) {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = "UPDATE Treatment SET PillId = ?, Begining = ?, End = ?, Morning = ?, Noon = ?, Evening = ? WHERE Id = ?";
+        String[] args = {
+                String.valueOf(treatmentToWorkOn.getPill().getId()),
+                String.valueOf(treatmentToWorkOn.getBeginning()),
+                String.valueOf(treatmentToWorkOn.getEnd()),
+                String.valueOf(treatmentToWorkOn.getPartsOfDay().contains(PartOfDay.MORNING) ? 1 : 0),
+                String.valueOf(treatmentToWorkOn.getPartsOfDay().contains(PartOfDay.NOON) ? 1 : 0),
+                String.valueOf(treatmentToWorkOn.getPartsOfDay().contains(PartOfDay.EVENING) ? 1 : 0),
+                String.valueOf(treatmentToWorkOn.getId())};
+        try {
+            db.execSQL(query, args);
+        } catch (Exception e) {
+            Log.i("Traitement : ", "updateTreatment : " + e.getMessage());
+        }
+    }
 }
 
