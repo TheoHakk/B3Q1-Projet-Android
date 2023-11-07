@@ -1,5 +1,7 @@
 package be.helha.hakem_android_project.models;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.List;
@@ -22,9 +24,9 @@ public class Treatment implements Serializable {
     public void setId(int id) {
         this.id = id;
     }
-    public int getId(){
-        return this.id;
-    }
+
+    public int getId() { return this.id; }
+
     public void setPill(Pill pill) {
         this.pill = pill;
     }
@@ -52,14 +54,34 @@ public class Treatment implements Serializable {
     public Calendar getBeginning() {
         return beginning;
     }
+
     public Calendar getEnd() {
         return end;
     }
+
+
+    //Because of this shity way of collecting Date, we have an issue with the date format
+    //We need to specify an index for the month, because it starts at 0
     public String getBeginningString() {
-        return beginning.get(Calendar.DAY_OF_MONTH) + "/" + beginning.get(Calendar.MONTH) + "/" + beginning.get(Calendar.YEAR);
+        int day = beginning.get(Calendar.DAY_OF_MONTH);
+        int month = beginning.get(Calendar.MONTH) + 1; //We add 1 for getting the real month
+        int year = beginning.get(Calendar.YEAR);
+        return day + "/" + month + "/" + year;
     }
+
     public String getEndString() {
-        return end.get(Calendar.DAY_OF_MONTH) + "/" + end.get(Calendar.MONTH) + "/" + end.get(Calendar.YEAR);
+        int day = end.get(Calendar.DAY_OF_MONTH);
+        int month = end.get(Calendar.MONTH) + 1;
+        int year = end.get(Calendar.YEAR);
+        return day + "/" + month + "/" + year;
+    }
+
+
+    public boolean containsTheDate(Calendar date){
+
+        if(date.getTime().after(beginning.getTime()) && date.getTime().before(end.getTime()))
+            return true;
+        return false;
     }
 
 }

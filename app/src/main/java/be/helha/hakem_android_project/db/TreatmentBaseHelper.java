@@ -122,6 +122,10 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
 
 
     public void insertTreatment(Treatment currentTreatment) {
+
+        Log.i("ALERT", currentTreatment.getBeginningString());
+        Log.i("ALERT", currentTreatment.getEndString());
+
         SQLiteDatabase db = getWritableDatabase();
         String query = "INSERT INTO Treatment (PillId, Beginning, End, Morning, Noon, Evening) VALUES (?, ?, ?, ?, ?, ?)";
         String[] args = {
