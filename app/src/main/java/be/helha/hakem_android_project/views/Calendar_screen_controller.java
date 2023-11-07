@@ -57,52 +57,11 @@ public class Calendar_screen_controller extends AppCompatActivity {
         try {
             for (final DayOfTreatment day : calendar) {
                 if (day.hasTreatment()) {
-                    TextView tv = new TextView(getApplicationContext());
-                    tv.setPadding(20, 0, 0, 10);
-                    tv.setText(day.getDateString());
-                    mContainer.addView(tv);
+                    addTextViewWithPadding("date", day.getDateString(), 25, 20, 0, 0, 10);
 
-                    TextView tv2 = new TextView(getApplicationContext());
-                    tv2.setPadding(50, 0, 0, 0);
-                    if (!day.getTreatsForMorning().isEmpty())
-                        tv2.setText("Morning : ");
-                    mContainer.addView(tv2);
-
-                    for (Treatment t : day.getTreatsForMorning()) {
-                        TextView textView = new TextView(getApplicationContext());
-                        textView.setOnClickListener(v -> showTreatmentScreen(t));
-                        textView.setPadding(75, 0, 0, 0);
-                        textView.setText(t.getPill().getName());
-                        mContainer.addView(textView);
-                    }
-
-                    TextView tv3 = new TextView(getApplicationContext());
-                    tv3.setPadding(50, 0, 0, 0);
-                    if (!day.getTreatsForNoon().isEmpty())
-                        tv3.setText("Noon : ");
-                    mContainer.addView(tv3);
-
-                    for (Treatment t : day.getTreatsForNoon()) {
-                        TextView textView = new TextView(getApplicationContext());
-                        textView.setOnClickListener(v -> showTreatmentScreen(t));
-                        textView.setPadding(75, 0, 0, 0);
-                        textView.setText(t.getPill().getName());
-                        mContainer.addView(textView);
-                    }
-
-                    TextView tv4 = new TextView(getApplicationContext());
-                    tv4.setPadding(50, 0, 0, 0);
-                    if (!day.getTreatsForEvening().isEmpty())
-                        tv4.setText("Evening : ");
-                    mContainer.addView(tv4);
-
-                    for (Treatment t : day.getTreatsForEvening()) {
-                        TextView textView = new TextView(getApplicationContext());
-                        textView.setOnClickListener(v -> showTreatmentScreen(t));
-                        textView.setPadding(75, 0, 0, 0);
-                        textView.setText(t.getPill().getName());
-                        mContainer.addView(textView);
-                    }
+                    addTreatmentTextViews(day.getTreatsForMorning(), "Matin");
+                    addTreatmentTextViews(day.getTreatsForNoon(), "Midi");
+                    addTreatmentTextViews(day.getTreatsForEvening(), "Soir");
                 }
             }
         } catch (Exception e) {
@@ -110,7 +69,38 @@ public class Calendar_screen_controller extends AppCompatActivity {
         }
     }
 
+    private void addTextViewWithPadding(String sender, String text, float fontSize, int left, int top, int right, int bottom) {
+        TextView tv = new TextView(getApplicationContext());
+        tv.setPadding(left, top, right, bottom);
+        tv.setText(text);
+        tv.setTextSize(fontSize);
+        if (sender == "date") {
+            tv.setTextAppearance(com.google.android.material.R.style.Base_TextAppearance_AppCompat_Large);
+            tv.setTypeface(tv.getTypeface());
+        } else if (sender == "partOfDay") {
+            tv.setTextAppearance(com.google.android.material.R.style.Base_TextAppearance_AppCompat_Medium);
+            tv.setPaintFlags(tv.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+        }
+        mContainer.addView(tv);
+    }
 
+    private void addTreatmentTextViews(List<Treatment> treatments, String label) {
+        if (!treatments.isEmpty()) {
+            addTextViewWithPadding("partOfDay", label, 15, 50, 0, 0, 0);
+            for (Treatment t : treatments) {
+                addTreatmentTextView(t);
+            }
+        }
+    }
+
+    private void addTreatmentTextView(Treatment t) {
+        TextView textView = new TextView(getApplicationContext());
+        textView.setOnClickListener(v -> showTreatmentScreen(t));
+        textView.setPadding(75, 0, 0, 0);
+        textView.setText(t.getPill().getName());
+        textView.setTextSize(15);
+        mContainer.addView(textView);
+    }
 
 
     private void initializeCalendar() {
@@ -118,7 +108,7 @@ public class Calendar_screen_controller extends AppCompatActivity {
         Calendar c = Calendar.getInstance();
         Log.i("Calendar : ", c.getTime().toString());
         //We will create a calendar of 30 days from today
-        for(int i = 0; i <= 30 ; i++) {
+        for (int i = 0; i <= 30; i++) {
             Calendar cal = Calendar.getInstance();
             cal.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) + i);
             calendar.add(new DayOfTreatment(cal));
@@ -126,14 +116,14 @@ public class Calendar_screen_controller extends AppCompatActivity {
 
         //We will search for every treatment that is in the calendar
         //and add it to the corresponding day, and the corresponding part of the day
-        for(DayOfTreatment d : calendar)
-            for(Treatment t : treatmentList)
-                if(t.containsTheDate(d.getDate())){
-                    if(t.getPartsOfDay().contains(PartOfDay.MORNING))
+        for (DayOfTreatment d : calendar)
+            for (Treatment t : treatmentList)
+                if (t.containsTheDate(d.getDate())) {
+                    if (t.getPartsOfDay().contains(PartOfDay.MORNING))
                         d.addTreatForMorning(t);
-                    if(t.getPartsOfDay().contains(PartOfDay.NOON))
+                    if (t.getPartsOfDay().contains(PartOfDay.NOON))
                         d.addTreatForNoon(t);
-                    if(t.getPartsOfDay().contains(PartOfDay.EVENING))
+                    if (t.getPartsOfDay().contains(PartOfDay.EVENING))
                         d.addTreatForEvening(t);
                 }
     }
@@ -165,8 +155,8 @@ public class Calendar_screen_controller extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        treatmentBaseHelper.close();
         super.onDestroy();
+        treatmentBaseHelper.close();
     }
 
 }

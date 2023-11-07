@@ -50,7 +50,7 @@ public class PartOfDay_fragment_controller extends Fragment {
     }
 
     public PartOfDay_fragment_controller() {
-        super(R.layout.part_of_day_fragment);
+        super(R.layout.calendar_part_fragment);
     }
 
     public boolean checkBoxState() {

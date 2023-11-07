@@ -15,14 +15,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/LV_pillsList"
-        android:layout_width="331dp"
-        android:layout_height="78dp"
-        android:layout_marginTop="44dp"
+    <LinearLayout
+        android:id="@+id/LL_container"
+        android:layout_width="369dp"
+        android:layout_height="130dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/TV_moment"></LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

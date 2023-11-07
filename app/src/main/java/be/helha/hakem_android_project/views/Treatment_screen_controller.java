@@ -54,6 +54,7 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
         init();
         putFragments();
+
         verifyIntent();
     }
 
@@ -106,11 +107,8 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
         try {
             Pill actualPill = (Pill) pillSpinner.getSelectedItem();
             List<PartOfDay> partsOfDay = partOfDayFragment.getPartsOfDay();
-            //TODO ici c'est bon, on a bien le mois de Novembre
             Calendar beginning = this.beginning;
             Calendar end = this.end;
-            Log.i("ALERT TREATMENT", "Pill : " + beginning.getTime());
-            Log.i("ALERT TREATMENT", "Pill : " + end.getTime());
             if (actualPill != null
                     && partsOfDay != null
                     && beginning != null
