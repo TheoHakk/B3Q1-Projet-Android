@@ -28,14 +28,7 @@
         app:layout_constraintBottom_toTopOf="@+id/FB_add_treatment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="11dp">
-
-        <LinearLayout
-            android:id="@+id/dayOfTreatmentList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+        android:layout_marginTop="11dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FB_add_treatment"

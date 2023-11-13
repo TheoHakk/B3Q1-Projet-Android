@@ -1,5 +1,6 @@
 package be.helha.hakem_android_project.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,49 +9,88 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.List;
 
 import be.helha.hakem_android_project.R;
+import be.helha.hakem_android_project.db.PillsBaseHelper;
+import be.helha.hakem_android_project.models.DayOfTreatment;
+import be.helha.hakem_android_project.models.Pill;
+import be.helha.hakem_android_project.views.Treatment_screen_controller;
 import be.helha.hakem_android_project.models.Treatment;
 
 public class Calendar_fragment_controller extends Fragment {
+    DayOfTreatment dayOfTreatment;
 
-    TextView partOfDay;
-    RecyclerView recyclerView;
-    List<Treatment> treatments;
-    LinearLayout mContainer;
+    TextView date;
+
+    TextView tvMorning;
+    TextView tvNoon;
+    TextView tvEvening;
+
+    LinearLayout llMorning;
+    LinearLayout llNoon;
+    LinearLayout llEvening;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.calendar_part_fragment, container, false);
-
-        /*
-        TODO : -Landscape
-               -Enregistrer les états
-               -Actualiser les états une fois qu'ils sont modifiés
-               -S'assurer de l'actualisation des données
-         */
-
-
         init();
-
         return view;
     }
 
     private void init() {
-        partOfDay = getView().findViewById(R.id.TV_moment);
-        recyclerView = getView().findViewById(R.id.LL_container);
-
+        date = getView().findViewById(R.id.TV_Date);
+        tvMorning = getView().findViewById(R.id.TV_Morning);
+        tvNoon = getView().findViewById(R.id.TV_Noon);
+        tvEvening = getView().findViewById(R.id.TV_Evening);
+        llMorning = getView().findViewById(R.id.LL_Morning);
+        llNoon = getView().findViewById(R.id.LL_Noon);
+        llEvening = getView().findViewById(R.id.LL_Evening);
     }
-    public void setTreatments(List<Treatment> treatments) {
-        this.treatments = treatments;
+
+    public void setDayOfTreatment(DayOfTreatment dayOfTreatment) {
+        this.dayOfTreatment = dayOfTreatment;
+        date.setText(dayOfTreatment.getDateString());
+
+        setTextViewVisibility(dayOfTreatment);
+
+        for (Treatment t : dayOfTreatment.getTreatsForMorning())
+            addViewPartsOfDay(t, llMorning);
+        for (Treatment t : dayOfTreatment.getTreatsForNoon())
+            addViewPartsOfDay(t, llNoon);
+        for (Treatment t : dayOfTreatment.getTreatsForEvening())
+            addViewPartsOfDay(t, llEvening);
+    }
+
+    private void addViewPartsOfDay(Treatment t, LinearLayout ll) {
+        TextView tv = new TextView(getContext());
+        tv.setText(t.getPill().getName());
+        tv.setOnClickListener(v -> {
+            showTreatmentScreen(t);
+        });
+        ll.addView(tv);
+    }
+
+    private void showTreatmentScreen(Treatment treatment) {
+        Intent i = new Intent(getContext(), Treatment_screen_controller.class);
+        i.putExtra("treatment", treatment);
+        startActivity(i);
+    }
+
+    private void setTextViewVisibility(DayOfTreatment dayOfTreatment) {
+        if (dayOfTreatment.getTreatsForMorning().isEmpty())
+            tvEvening.setVisibility(View.GONE);
+        if (dayOfTreatment.getTreatsForNoon().isEmpty())
+            tvNoon.setVisibility(View.GONE);
+        if (dayOfTreatment.getTreatsForEvening().isEmpty())
+            tvEvening.setVisibility(View.GONE);
+    }
+
+    public boolean isInitialized() {
+        return date != null;
     }
 
     public Calendar_fragment_controller() {
         super(R.layout.calendar_part_fragment);
     }
-
-
 
 }

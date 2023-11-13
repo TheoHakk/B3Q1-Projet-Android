@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -15,6 +18,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import be.helha.hakem_android_project.R;
 import be.helha.hakem_android_project.db.TreatmentBaseHelper;
@@ -28,23 +32,19 @@ public class Calendar_screen_controller extends AppCompatActivity {
     TreatmentBaseHelper treatmentBaseHelper;
     List<Treatment> treatmentList;
     List<DayOfTreatment> calendar;
-    LinearLayout mContainer;
+    ScrollView mContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_activity);
-        try {
-            init();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        init();
     }
 
-    private void init() throws ParseException {
+    private void init() {
         getTreatments();
         addTreatment = findViewById(R.id.FB_add_treatment);
-        mContainer = findViewById(R.id.dayOfTreatmentList);
+        mContainer = findViewById(R.id.scrollView2);
 
         initializeCalendar();
         updateUI();
@@ -54,54 +54,9 @@ public class Calendar_screen_controller extends AppCompatActivity {
 
     private void updateUI() {
         mContainer.removeAllViews();
-        try {
-            for (final DayOfTreatment day : calendar) {
-                if (day.hasTreatment()) {
-                    addTextViewWithPadding("date", day.getDateString(), 25, 20, 0, 0, 10);
 
-                    addTreatmentTextViews(day.getTreatsForMorning(), "Matin");
-                    addTreatmentTextViews(day.getTreatsForNoon(), "Midi");
-                    addTreatmentTextViews(day.getTreatsForEvening(), "Soir");
-                }
-            }
-        } catch (Exception e) {
-            Log.i("ALERT", "updateUI: " + e.getMessage());
-        }
+
     }
-
-    private void addTextViewWithPadding(String sender, String text, float fontSize, int left, int top, int right, int bottom) {
-        TextView tv = new TextView(getApplicationContext());
-        tv.setPadding(left, top, right, bottom);
-        tv.setText(text);
-        tv.setTextSize(fontSize);
-        if (sender == "date") {
-            tv.setTextAppearance(com.google.android.material.R.style.Base_TextAppearance_AppCompat_Large);
-            tv.setTypeface(tv.getTypeface());
-        } else if (sender == "partOfDay") {
-            tv.setTextAppearance(com.google.android.material.R.style.Base_TextAppearance_AppCompat_Medium);
-            tv.setPaintFlags(tv.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
-        }
-        mContainer.addView(tv);
-    }
-
-    private void addTreatmentTextViews(List<Treatment> treatments, String label) {
-        if (!treatments.isEmpty()) {
-            addTextViewWithPadding("partOfDay", label, 15, 50, 0, 0, 0);
-            for (Treatment t : treatments) {
-                addTreatmentTextView(t);
-            }
-        }
-    }
-
-    private void addTreatmentTextView(Treatment t) {
-        TextView textView = new TextView(getApplicationContext());
-        textView.setOnClickListener(v -> showTreatmentScreen(t));
-        textView.setPadding(75, 0, 0, 0);
-        textView.setText(t.getPill().getName());
-        textView.setTextSize(15);
-        mContainer.addView(textView);
-    }
-
 
     private void initializeCalendar() {
         calendar = new ArrayList<>();
