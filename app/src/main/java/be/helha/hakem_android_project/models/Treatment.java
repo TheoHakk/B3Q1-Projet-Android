@@ -67,9 +67,7 @@ public class Treatment implements Serializable {
         int month = beginning.get(Calendar.MONTH) + 1; //We add 1 for getting the real month
         int year = beginning.get(Calendar.YEAR);
         //We need to format the date to a string with the format dd/mm/yyyy
-        String sdate = day + "/" + month + "/" + year;
-        Log.i("begin date : ", sdate);
-        return sdate;
+        return day + "/" + month + "/" + year;
     }
 
     public String getEndString() {
@@ -77,23 +75,13 @@ public class Treatment implements Serializable {
         int month = end.get(Calendar.MONTH) + 1;
         int year = end.get(Calendar.YEAR);
         String sdate = day + "/" + month + "/" + year;
-        Log.i("end date : ", sdate);
         return sdate;
     }
 
 
     public boolean containsTheDate(Calendar date) {
 
-        Log.i("Wouah date :", date.getTime().toString());
-        Log.i("Wouah beginning :", beginning.getTime().toString());
-        Log.i("Wouah end :", end.getTime().toString());
-
-
-        if (date.getTime().compareTo(beginning.getTime()) > 0 && date.getTime().compareTo(end.getTime()) <= 0) {
-            Log.i("Wouah", "containsTheDate: true");
-            return true;
-        }
-        return false;
+        return date.getTime().compareTo(beginning.getTime()) > 0 && date.getTime().compareTo(end.getTime()) <= 0;
     }
 
 }

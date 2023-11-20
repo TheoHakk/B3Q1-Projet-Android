@@ -56,7 +56,6 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
     }
 
     public List<Treatment> getTreatments(Context context) throws ParseException {
-        Log.i("Traitement : ", "getTreatments");
 
         List<Treatment> treatments = new ArrayList<>();
 
@@ -114,7 +113,6 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
         //We need to convert the string to a usable calendar
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        Log.i("yaourt", dateString);
         Date date = sdf.parse(dateString);
         calendar.setTime(date);
         return calendar;

@@ -105,14 +105,12 @@ public class Pill_screen_controller extends AppCompatActivity {
         try {
             if (name.getText().toString().isEmpty() || duration == 0)
                 throw new Exception("Name or duration is empty");
-            Log.i("Lecture ", "validatePill: " + name.getText().toString() + " , " + duration + " , " + partOfDayFragment.getPartsOfDay());
             pill = new Pill(name.getText().toString(), duration, partOfDayFragment.getPartsOfDay());
         } catch (Exception e) {
             Log.i("ERROR", "validatePill: " + e.getMessage());
             e.getStackTrace();
         }
         if (pill != null){
-            Log.i("Pill", "Name : " + pill.getName() + " , Duration : " + pill.getDuration() + " , Parts of day : " + pill.getStringPartsOfDay());
             PillsBaseHelper pillsBaseHelper = new PillsBaseHelper(this);
             try {
                 pillsBaseHelper.insertPill(pill);
@@ -120,15 +118,13 @@ public class Pill_screen_controller extends AppCompatActivity {
                 Log.i("ERROR", "validatePill: " + e.getMessage());
             }
         }
-        else Log.i("Pill", "Pill is null");
 
     }
 
     private void updatePill() {
         PillsBaseHelper pillsBaseHelper = new PillsBaseHelper(this);
         try {
-            Log.i("Lecture ", "validatePill: " + name.getText().toString() + " , " + duration + " , " + partOfDayFragment.getPartsOfDay());
-            pillToWorkOn.setName(name.getText().toString());
+           pillToWorkOn.setName(name.getText().toString());
             pillToWorkOn.setDuration(duration);
             pillToWorkOn.setPartOfDays(partOfDayFragment.getPartsOfDay());
             pillsBaseHelper.updatePill(pillToWorkOn);

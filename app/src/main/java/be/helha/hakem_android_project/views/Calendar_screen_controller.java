@@ -66,25 +66,25 @@ public class Calendar_screen_controller extends AppCompatActivity {
         mContainer.removeAllViews();
         //Insert for each day a fragment
         for (DayOfTreatment d : calendar) {
-            Calendar_fragment_controller fragment = new Calendar_fragment_controller(d);
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(mContainer.getId(), fragment)
-                    .commit();
+            if (d.hasTreatment()) {
+                Calendar_fragment_controller fragment = new Calendar_fragment_controller(d);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(mContainer.getId(), fragment)
+                        .commit();
+            }
         }
     }
 
     private void initializeCalendar() {
         calendar = new ArrayList<>();
         Calendar c = Calendar.getInstance();
-        Log.i("Calendar : ", c.getTime().toString());
         //We will create a calendar of 30 days from today
         for (int i = 0; i <= NB_DAYS_CALENDAR; i++) {
             Calendar cal = Calendar.getInstance();
             cal.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) + i);
             calendar.add(new DayOfTreatment(cal));
         }
-
         initializePartsOfDay();
     }
 
@@ -107,12 +107,9 @@ public class Calendar_screen_controller extends AppCompatActivity {
         treatmentBaseHelper = new TreatmentBaseHelper(this);
         try {
             treatmentList = treatmentBaseHelper.getTreatments(this);
-            Log.i("Traitement : ", "C'est ok !");
-            for (Treatment t : treatmentList)
-                Log.i("Traitement : ", t.getPill().getName());
         } catch (Exception e) {
             Log.i("Traitement : ", "C'est pas ok ! " + e.getMessage());
-            e.printStackTrace();
+
         }
     }
 

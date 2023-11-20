@@ -75,8 +75,6 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
         if (treatmentToWorkOn != null)
             showTreatmentInformations();
 
-        if(treatmentToWorkOn != null)
-            Log.i("Test de traitement :", treatmentToWorkOn.getPill().getName());
 
     }
 
@@ -117,13 +115,11 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     }
 
     private void updateTreatment(Treatment actualTreatmentSettings) {
-        Log.i("Test de traitement précédent :", treatmentToWorkOn.getPill().getName());
         TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
         treatmentToWorkOn.setBeginning(actualTreatmentSettings.getBeginning());
         treatmentToWorkOn.setEnd(actualTreatmentSettings.getEnd());
         treatmentToWorkOn.setPartsOfDay(actualTreatmentSettings.getPartsOfDay());
         treatmentToWorkOn.setPill(actualTreatmentSettings.getPill());
-        Log.i("Test de traitement après :", treatmentToWorkOn.getPill().getName());
 
         treatmentBaseHelper.updateTreatment(treatmentToWorkOn);
     }
@@ -150,8 +146,7 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
 
     private void insertNewTreatment(Treatment currentTreatment) {
-        Log.i("Test de traitement new :", currentTreatment.getPill().getName());
-        TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
+       TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
         treatmentBaseHelper.insertTreatment(currentTreatment);
     }
 
