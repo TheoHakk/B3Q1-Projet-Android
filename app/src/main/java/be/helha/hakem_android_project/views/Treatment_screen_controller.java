@@ -38,7 +38,7 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     FloatingActionButton modifyPill;
     TextView beginningDate;
     TextView endDate;
-    TextView recommanded_duration;
+    TextView recommended_duration;
     Calendar beginning;
     Calendar end;
     Treatment treatmentToWorkOn;
@@ -51,10 +51,21 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_treatment_activity);
-
         init();
-        putFragments();
+    }
 
+    @Override
+    protected void onResume() {
+        //Update the view when we come back to the screen
+        super.onResume();
+        init();
+    }
+
+    private void init() {
+        initializeView();
+        initializePills();
+        setActions();
+        putFragments();
         verifyIntent();
     }
 
@@ -63,6 +74,10 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
             treatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
         if (treatmentToWorkOn != null)
             showTreatmentInformations();
+
+        if(treatmentToWorkOn != null)
+            Log.i("Test de traitement :", treatmentToWorkOn.getPill().getName());
+
     }
 
     private void showTreatmentInformations() {
@@ -72,7 +87,7 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
         duration = actualPill.getDuration();
         beginningDate.setText(beginning.get(Calendar.DAY_OF_MONTH) + "/" + (beginning.get(Calendar.MONTH) + 1) + "/" + beginning.get(Calendar.YEAR));
         endDate.setText(end.get(Calendar.DAY_OF_MONTH) + "/" + (end.get(Calendar.MONTH) + 1) + "/" + end.get(Calendar.YEAR));
-        recommanded_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + actualPill.getDuration() + " jours");
+        recommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + actualPill.getDuration() + " jours");
 
         pillSpinner.setSelection(actualPill.getId() - 1);
         //Because of the fragment commit, we need to wait the fragment has instantiate its views
@@ -91,15 +106,26 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
     private void createNewTreatment() {
         Treatment treatmentToInsert = getCurrentTreatment();
-
-
         if (treatmentToInsert != null) {
             if (treatmentToWorkOn != null)
                 updateTreatment(treatmentToInsert);
             else
                 insertNewTreatment(treatmentToInsert);
+            finish();
         } else
             Toast.makeText(getApplicationContext(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateTreatment(Treatment actualTreatmentSettings) {
+        Log.i("Test de traitement précédent :", treatmentToWorkOn.getPill().getName());
+        TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
+        treatmentToWorkOn.setBeginning(actualTreatmentSettings.getBeginning());
+        treatmentToWorkOn.setEnd(actualTreatmentSettings.getEnd());
+        treatmentToWorkOn.setPartsOfDay(actualTreatmentSettings.getPartsOfDay());
+        treatmentToWorkOn.setPill(actualTreatmentSettings.getPill());
+        Log.i("Test de traitement après :", treatmentToWorkOn.getPill().getName());
+
+        treatmentBaseHelper.updateTreatment(treatmentToWorkOn);
     }
 
     private Treatment getCurrentTreatment() {
@@ -117,32 +143,25 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
                     && !partsOfDay.isEmpty())
                 treatmentToInsert = new Treatment(actualPill, partOfDayFragment.getPartsOfDay(), beginning, end);
         } catch (Exception e) {
-            Log.i("Error", Objects.requireNonNull(e.getMessage()));
+            Log.i("Error ", Objects.requireNonNull(e.getMessage()));
         }
         return treatmentToInsert;
     }
 
+
     private void insertNewTreatment(Treatment currentTreatment) {
+        Log.i("Test de traitement new :", currentTreatment.getPill().getName());
         TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
         treatmentBaseHelper.insertTreatment(currentTreatment);
     }
 
-    private void updateTreatment(Treatment currentTreatment) {
-        TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
-        treatmentToWorkOn.setBeginning(currentTreatment.getBeginning());
-        treatmentToWorkOn.setEnd(currentTreatment.getEnd());
-        treatmentToWorkOn.setPill(currentTreatment.getPill());
-        treatmentToWorkOn.setPartsOfDay(currentTreatment.getPartsOfDay());
 
-        treatmentBaseHelper.updateTreatment(treatmentToWorkOn);
-    }
-
-    private void init() {
+    private void initializeView() {
         openDatePickerButtonBeginning = findViewById(R.id.B_DP_begin);
         openDatePickerButtonEnd = findViewById(R.id.B_DP_end);
         beginningDate = findViewById(R.id.TV_begin_date);
         endDate = findViewById(R.id.TV_end_date);
-        recommanded_duration = findViewById(R.id.TV_recommanded_duration);
+        recommended_duration = findViewById(R.id.TV_recommanded_duration);
 
         addPill = findViewById(R.id.B_add_pill);
         modifyPill = findViewById(R.id.B_modify_pill);
@@ -152,9 +171,6 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
         beginning = null;
         end = null;
-
-        initializePills();
-        setActions();
     }
 
     private void initializePills() {
@@ -247,7 +263,7 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         actualPill = (Pill) adapterView.getItemAtPosition(i);
-        recommanded_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + actualPill.getDuration() + " jours");
+        recommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + actualPill.getDuration() + " jours");
         duration = actualPill.getDuration();
         partOfDayFragment.setCheckBoxState(actualPill);
     }

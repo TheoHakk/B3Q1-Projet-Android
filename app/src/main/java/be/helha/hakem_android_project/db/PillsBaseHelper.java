@@ -16,9 +16,11 @@ import be.helha.hakem_android_project.models.PillsDbSchema;
 public class PillsBaseHelper extends SQLiteOpenHelper {
     private static final int VERSION = 1; // version de la base de donnée, va servir à savoir s'il faut mettre à jour le code
     private static final String DATABASE_NAME = "db_onlypills.db";
+
     public PillsBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         //We will try to create the database
@@ -47,12 +49,9 @@ public class PillsBaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-
-    public void insertPill(Pill pill){
+    public void insertPill(Pill pill) {
         SQLiteDatabase db = getWritableDatabase();
         String query = "INSERT INTO Pills (Name, Duration, Morning, Noon, Evening) VALUES (?, ?, ?, ?, ?)";
-
-
         String[] args = {
                 pill.getName(),
                 String.valueOf(pill.getDuration()),
@@ -80,11 +79,8 @@ public class PillsBaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public List<Pill> getPills(){
-
-        List<Pill> pills = new ArrayList<>();
-
-        String query = "SELECT * FROM Pills";
+    public List<Pill> getPills() {
+        String query = "SELECT * FROM " + PillsDbSchema.NAME;
         SQLiteDatabase db;
         Cursor cursor = null;
 
@@ -97,7 +93,11 @@ public class PillsBaseHelper extends SQLiteOpenHelper {
             Log.i("Traitement : ", "getPills : " + e.getMessage());
         }
 
+        return extractPills(cursor);
+    }
 
+    private static ArrayList extractPills(Cursor cursor) {
+        List<Pill> pills = new ArrayList<>();
         //Parcours du curseur sur toutes les colonnes
         assert cursor != null;
         if (cursor.moveToFirst()) {
@@ -126,11 +126,10 @@ public class PillsBaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         cursor.close();
-        return pills;
+        return (ArrayList) pills;
     }
-    public Pill getSpecificPill(int id){
-        Pill pill = null;
 
+    public Pill getSpecificPill(int id) {
         // Obtention d'une référence vers la db
         SQLiteDatabase db = getReadableDatabase();
         String query = "SELECT * FROM Pills WHERE Id = ?";
@@ -139,7 +138,11 @@ public class PillsBaseHelper extends SQLiteOpenHelper {
         // Exécution de la requête avec des paramètres
         Cursor cursor = db.rawQuery(query, args);
 
+        return extractSpecificPill(cursor);
+    }
 
+    private static Pill extractSpecificPill(Cursor cursor) {
+        Pill pill = null;
         //Parcours du curseur sur toutes les colonnes
         if (cursor.moveToFirst()) {
             do {

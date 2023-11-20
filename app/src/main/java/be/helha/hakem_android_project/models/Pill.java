@@ -52,9 +52,8 @@ public class Pill implements Serializable {
 
     public String getStringPartsOfDay() {
         String partsOfDay = "";
-        for (PartOfDay partOfDay : this.partOfDays) {
+        for (PartOfDay partOfDay : this.partOfDays)
             partsOfDay += partOfDay.toString() + " ";
-        }
         return partsOfDay;
     }
 }

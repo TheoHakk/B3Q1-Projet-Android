@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import be.helha.hakem_android_project.R;
@@ -33,22 +35,24 @@ public class Calendar_fragment_controller extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.calendar_part_fragment, container, false);
-        init();
+        init(view);
         return view;
     }
 
-    private void init() {
-        date = getView().findViewById(R.id.TV_Date);
-        tvMorning = getView().findViewById(R.id.TV_Morning);
-        tvNoon = getView().findViewById(R.id.TV_Noon);
-        tvEvening = getView().findViewById(R.id.TV_Evening);
-        llMorning = getView().findViewById(R.id.LL_Morning);
-        llNoon = getView().findViewById(R.id.LL_Noon);
-        llEvening = getView().findViewById(R.id.LL_Evening);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        //We will now sure that the view is created, and we can use it
+        //Otherwise, we would have a NullPointerException
+        super.onViewCreated(view, savedInstanceState);
+        updateUI();
     }
 
-    public void setDayOfTreatment(DayOfTreatment dayOfTreatment) {
+    public Calendar_fragment_controller(DayOfTreatment dayOfTreatment) {
+        super(R.layout.calendar_part_fragment);
         this.dayOfTreatment = dayOfTreatment;
+    }
+
+    public void updateUI() {
         date.setText(dayOfTreatment.getDateString());
 
         setTextViewVisibility(dayOfTreatment);
@@ -61,12 +65,21 @@ public class Calendar_fragment_controller extends Fragment {
             addViewPartsOfDay(t, llEvening);
     }
 
+    private void init(View view) {
+        date = view.findViewById(R.id.TV_Date);
+        tvMorning = view.findViewById(R.id.TV_Morning);
+        tvNoon = view.findViewById(R.id.TV_Noon);
+        tvEvening = view.findViewById(R.id.TV_Evening);
+        llMorning = view.findViewById(R.id.LL_Morning);
+        llNoon = view.findViewById(R.id.LL_Noon);
+        llEvening = view.findViewById(R.id.LL_Evening);
+    }
+
     private void addViewPartsOfDay(Treatment t, LinearLayout ll) {
         TextView tv = new TextView(getContext());
         tv.setText(t.getPill().getName());
-        tv.setOnClickListener(v -> {
-            showTreatmentScreen(t);
-        });
+        tv.setOnClickListener(v -> showTreatmentScreen(t));
+        tv.setPadding(150, 0, 0, 0);
         ll.addView(tv);
     }
 
@@ -84,13 +97,4 @@ public class Calendar_fragment_controller extends Fragment {
         if (dayOfTreatment.getTreatsForEvening().isEmpty())
             tvEvening.setVisibility(View.GONE);
     }
-
-    public boolean isInitialized() {
-        return date != null;
-    }
-
-    public Calendar_fragment_controller() {
-        super(R.layout.calendar_part_fragment);
-    }
-
 }

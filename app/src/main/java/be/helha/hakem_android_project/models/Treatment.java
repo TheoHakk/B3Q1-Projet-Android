@@ -25,7 +25,9 @@ public class Treatment implements Serializable {
         this.id = id;
     }
 
-    public int getId() { return this.id; }
+    public int getId() {
+        return this.id;
+    }
 
     public void setPill(Pill pill) {
         this.pill = pill;
@@ -60,27 +62,37 @@ public class Treatment implements Serializable {
     }
 
 
-    //Because of this shity way of collecting Date, we have an issue with the date format
-    //We need to specify an index for the month, because it starts at 0
     public String getBeginningString() {
         int day = beginning.get(Calendar.DAY_OF_MONTH);
         int month = beginning.get(Calendar.MONTH) + 1; //We add 1 for getting the real month
         int year = beginning.get(Calendar.YEAR);
-        return day + "/" + month + "/" + year;
+        //We need to format the date to a string with the format dd/mm/yyyy
+        String sdate = day + "/" + month + "/" + year;
+        Log.i("begin date : ", sdate);
+        return sdate;
     }
 
     public String getEndString() {
         int day = end.get(Calendar.DAY_OF_MONTH);
         int month = end.get(Calendar.MONTH) + 1;
         int year = end.get(Calendar.YEAR);
-        return day + "/" + month + "/" + year;
+        String sdate = day + "/" + month + "/" + year;
+        Log.i("end date : ", sdate);
+        return sdate;
     }
 
 
-    public boolean containsTheDate(Calendar date){
+    public boolean containsTheDate(Calendar date) {
 
-        if(date.getTime().after(beginning.getTime()) && date.getTime().before(end.getTime()))
+        Log.i("Wouah date :", date.getTime().toString());
+        Log.i("Wouah beginning :", beginning.getTime().toString());
+        Log.i("Wouah end :", end.getTime().toString());
+
+
+        if (date.getTime().compareTo(beginning.getTime()) > 0 && date.getTime().compareTo(end.getTime()) <= 0) {
+            Log.i("Wouah", "containsTheDate: true");
             return true;
+        }
         return false;
     }
 

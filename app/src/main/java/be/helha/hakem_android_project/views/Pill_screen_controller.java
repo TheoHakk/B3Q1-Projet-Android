@@ -98,6 +98,7 @@ public class Pill_screen_controller extends AppCompatActivity {
             updatePill();
         else
             createNewPill();
+        finish();
     }
     private void createNewPill() {
         Pill pill = null;

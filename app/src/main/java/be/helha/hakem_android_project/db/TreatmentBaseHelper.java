@@ -114,24 +114,20 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
         //We need to convert the string to a usable calendar
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Log.i("yaourt", dateString);
         Date date = sdf.parse(dateString);
         calendar.setTime(date);
         return calendar;
     }
 
 
-
     public void insertTreatment(Treatment currentTreatment) {
-
-        Log.i("ALERT", currentTreatment.getBeginningString());
-        Log.i("ALERT", currentTreatment.getEndString());
-
         SQLiteDatabase db = getWritableDatabase();
         String query = "INSERT INTO Treatment (PillId, Beginning, End, Morning, Noon, Evening) VALUES (?, ?, ?, ?, ?, ?)";
         String[] args = {
                 String.valueOf(currentTreatment.getPill().getId()),
-                String.valueOf(currentTreatment.getBeginningString()),
-                String.valueOf(currentTreatment.getEndString()),
+                currentTreatment.getBeginningString(),
+                currentTreatment.getEndString(),
                 String.valueOf(currentTreatment.getPartsOfDay().contains(PartOfDay.MORNING) ? 1 : 0),
                 String.valueOf(currentTreatment.getPartsOfDay().contains(PartOfDay.NOON) ? 1 : 0),
                 String.valueOf(currentTreatment.getPartsOfDay().contains(PartOfDay.EVENING) ? 1 : 0)};
@@ -144,11 +140,11 @@ public class TreatmentBaseHelper extends SQLiteOpenHelper {
 
     public void updateTreatment(Treatment treatmentToWorkOn) {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "UPDATE Treatment SET PillId = ?, Begining = ?, End = ?, Morning = ?, Noon = ?, Evening = ? WHERE Id = ?";
+        String query = "UPDATE Treatment SET PillId = ?, Beginning = ?, End = ?, Morning = ?, Noon = ?, Evening = ? WHERE Id = ?";
         String[] args = {
                 String.valueOf(treatmentToWorkOn.getPill().getId()),
-                String.valueOf(treatmentToWorkOn.getBeginning()),
-                String.valueOf(treatmentToWorkOn.getEnd()),
+                treatmentToWorkOn.getBeginningString(),
+                treatmentToWorkOn.getEndString(),
                 String.valueOf(treatmentToWorkOn.getPartsOfDay().contains(PartOfDay.MORNING) ? 1 : 0),
                 String.valueOf(treatmentToWorkOn.getPartsOfDay().contains(PartOfDay.NOON) ? 1 : 0),
                 String.valueOf(treatmentToWorkOn.getPartsOfDay().contains(PartOfDay.EVENING) ? 1 : 0),

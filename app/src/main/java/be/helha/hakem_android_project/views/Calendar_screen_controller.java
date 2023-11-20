@@ -10,7 +10,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -28,11 +30,13 @@ import be.helha.hakem_android_project.models.Treatment;
 
 public class Calendar_screen_controller extends AppCompatActivity {
 
+    public static final int NB_DAYS_CALENDAR = 30;
     FloatingActionButton addTreatment;
     TreatmentBaseHelper treatmentBaseHelper;
     List<Treatment> treatmentList;
     List<DayOfTreatment> calendar;
-    ScrollView mContainer;
+
+    LinearLayout mContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +45,17 @@ public class Calendar_screen_controller extends AppCompatActivity {
         init();
     }
 
+    @Override
+    protected void onResume() {
+        //We will update the calendar when we come back to the screen
+        super.onResume();
+        init();
+    }
+
     private void init() {
         getTreatments();
         addTreatment = findViewById(R.id.FB_add_treatment);
-        mContainer = findViewById(R.id.scrollView2);
-
+        mContainer = findViewById(R.id.container);
         initializeCalendar();
         updateUI();
         setActions();
@@ -54,8 +64,14 @@ public class Calendar_screen_controller extends AppCompatActivity {
 
     private void updateUI() {
         mContainer.removeAllViews();
-
-
+        //Insert for each day a fragment
+        for (DayOfTreatment d : calendar) {
+            Calendar_fragment_controller fragment = new Calendar_fragment_controller(d);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(mContainer.getId(), fragment)
+                    .commit();
+        }
     }
 
     private void initializeCalendar() {
@@ -63,14 +79,18 @@ public class Calendar_screen_controller extends AppCompatActivity {
         Calendar c = Calendar.getInstance();
         Log.i("Calendar : ", c.getTime().toString());
         //We will create a calendar of 30 days from today
-        for (int i = 0; i <= 30; i++) {
+        for (int i = 0; i <= NB_DAYS_CALENDAR; i++) {
             Calendar cal = Calendar.getInstance();
             cal.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) + i);
             calendar.add(new DayOfTreatment(cal));
         }
 
+        initializePartsOfDay();
+    }
+
+    private void initializePartsOfDay() {
         //We will search for every treatment that is in the calendar
-        //and add it to the corresponding day, and the corresponding part of the day
+        //and add it to the corresponding day, and the corresponded part of the day
         for (DayOfTreatment d : calendar)
             for (Treatment t : treatmentList)
                 if (t.containsTheDate(d.getDate())) {
@@ -91,7 +111,7 @@ public class Calendar_screen_controller extends AppCompatActivity {
             for (Treatment t : treatmentList)
                 Log.i("Traitement : ", t.getPill().getName());
         } catch (Exception e) {
-            Log.i("Traitement : ", "C'est pas ok !");
+            Log.i("Traitement : ", "C'est pas ok ! " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -104,7 +124,6 @@ public class Calendar_screen_controller extends AppCompatActivity {
         Intent intent = new Intent(this, Treatment_screen_controller.class);
         if (treatment != null)
             intent.putExtra("treatment", treatment);
-
         startActivity(intent);
     }
 
