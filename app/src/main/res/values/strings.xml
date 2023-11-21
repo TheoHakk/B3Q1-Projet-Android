@@ -22,4 +22,7 @@
     <string name="arrow_down">⬇️</string>
     <string name="pill">Médicament</string>
     <string name="recommanded_duration">Durée recommandée :</string>
+    <string name="noEmptyField">Veuillez remplir tous les champs</string>
+    <string name="errorBeginDateAfterEnd">La date de fin ne peut pas être avant la date de début, et doit respecter la durée du traitement</string>
+    <string name="dateError">Erreur date</string>
 </resources>

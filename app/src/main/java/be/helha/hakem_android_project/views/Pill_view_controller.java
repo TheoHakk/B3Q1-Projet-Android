@@ -11,10 +11,11 @@ import androidx.fragment.app.FragmentManager;
 
 
 import be.helha.hakem_android_project.R;
+import be.helha.hakem_android_project.db.BankPill;
 import be.helha.hakem_android_project.db.ProjectBaseHelper;
 import be.helha.hakem_android_project.models.Pill;
 
-public class Pill_screen_controller extends AppCompatActivity {
+public class Pill_view_controller extends AppCompatActivity {
 
     private Button mBUpDays;
     private Button mBDownDays;
@@ -49,7 +50,7 @@ public class Pill_screen_controller extends AppCompatActivity {
 
         //Because of the fragment commit, we need to wait the fragment has instantiate its views
         Thread thread = new Thread(() -> {
-            while (!mPartOfDayFragment.checkBoxState()) {
+            while (mPartOfDayFragment.checkBoxState()) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -112,12 +113,12 @@ public class Pill_screen_controller extends AppCompatActivity {
             pill = new Pill(mETName.getText().toString(), mDuration, mPartOfDayFragment.getPartsOfDay());
         } catch (Exception e) {
             Log.i("ERROR", "validatePill: " + e.getMessage());
-            e.getStackTrace();
         }
         if (pill != null) {
             ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
+            BankPill bankPill = new BankPill(projectBaseHelper.getWritableDatabase());
             try {
-                projectBaseHelper.insertPill(pill);
+                bankPill.insertPill(pill);
             } catch (Exception e) {
                 Log.i("ERROR", "validatePill: " + e.getMessage());
             }
@@ -127,11 +128,12 @@ public class Pill_screen_controller extends AppCompatActivity {
 
     private void updatePill() {
         ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
+        BankPill bankPill = new BankPill(projectBaseHelper.getWritableDatabase());
         try {
             mPillToWorkOn.setName(mETName.getText().toString());
             mPillToWorkOn.setDuration(mDuration);
             mPillToWorkOn.setPartsOfDay(mPartOfDayFragment.getPartsOfDay());
-            projectBaseHelper.updatePill(mPillToWorkOn);
+            bankPill.updatePill(mPillToWorkOn);
         } catch (Exception e) {
             Log.i("ERROR", "updatePill: " + e.getMessage());
         }
@@ -140,7 +142,6 @@ public class Pill_screen_controller extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        //TODO s'il y a une db, fermer la db
         super.onDestroy();
     }
 }

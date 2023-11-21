@@ -19,19 +19,17 @@ public class PillAdapter extends ArrayAdapter<Pill> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         /*
-            Cette méthode est appelée pour afficher un élément
-            dans le Spinner lorsque ce dernier est fermé.
+            This method is called to display an element
+            in the Spinner when the latter is closed.
          */
-
-        //La convertView est l'élément qui va être affiché
+        //The convertView is the element that will be displayed
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_item, parent, false);
 
-        //J'obtiens une position, celle de l'item sur lequel je suis, qui équivaut à celle de la liste
+        //I get a position, the one of the item on which I am, which is equivalent to that of the list
         Pill pill = getItem(position);
 
-
-        //Je récupère le TextView qui va afficher le nom de la pill
+        //I get the TextView that will display the name of the pill
         TextView textView = convertView.findViewById(android.R.id.text1);
         if (pill != null)
             textView.setText(pill.getName());
@@ -42,23 +40,21 @@ public class PillAdapter extends ArrayAdapter<Pill> {
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         /*
-            Cette méthode est appelée pour afficher les éléments dans
-            la liste déroulante lorsque l'utilisateur déroule le Spinner
-            pour sélectionner un élément.
+            This method is called to display the elements in
+            the drop-down list when the user scrolls the Spinner
+            to select an item.
          */
-
-        //La convertView est l'élément qui va être affiché
+        //The convertView is the element that will be displayed
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
 
-        //Idem, j'obtiens une position, celle de l'item sur lequel je suis, qui équivaut à celle de la liste
+        //I get a position, the one of the item on which I am, which is equivalent to that of the list
         Pill pill = getItem(position);
 
-        //Je récupère le TextView qui va afficher le nom de la pill
+        //I get the TextView that will display the name of the pill
         TextView textView = convertView.findViewById(android.R.id.text1);
-        if (pill != null) {
+        if (pill != null)
             textView.setText(pill.getName());
-        }
 
         return convertView;
     }

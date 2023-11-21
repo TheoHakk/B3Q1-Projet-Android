@@ -3,6 +3,8 @@ package be.helha.hakem_android_project.views;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,12 +26,16 @@ import java.util.List;
 import java.util.Objects;
 
 import be.helha.hakem_android_project.R;
+import be.helha.hakem_android_project.db.BankTreatment;
+import be.helha.hakem_android_project.db.DBSchema;
+import be.helha.hakem_android_project.db.PillsCursorWrapper;
 import be.helha.hakem_android_project.db.ProjectBaseHelper;
+import be.helha.hakem_android_project.db.TreatmentsCursorWrapper;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
 import be.helha.hakem_android_project.models.Treatment;
 
-public class Treatment_screen_controller extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class Treatment_view_controller extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Button mBOpenDatePickerButtonBeginning;
     private Button mBOpenDatePickerButtonEnd;
     private Button mBTreatmentValidation;
@@ -85,9 +91,13 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
         mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + " jours");
 
         mSPillSpinner.setSelection(mActualPill.getId() - 1);
+        launchThreadForBoxChecking();
+    }
+
+    private void launchThreadForBoxChecking() {
         //Because of the fragment commit, we need to wait the fragment has instantiate its views
         Thread thread = new Thread(() -> {
-            while (!mPartOfDayFragment.checkBoxState()) {
+            while (mPartOfDayFragment.checkBoxState()) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -108,17 +118,19 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
                 insertNewTreatment(treatmentToInsert);
             finish();
         } else
-            Toast.makeText(getApplicationContext(), "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.noEmptyField), Toast.LENGTH_SHORT).show();
     }
 
     private void updateTreatment(Treatment actualTreatmentSettings) {
         ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
+        BankTreatment bankTreatment = new BankTreatment(projectBaseHelper.getWritableDatabase());
+
         mTreatmentToWorkOn.setBeginning(actualTreatmentSettings.getBeginning());
         mTreatmentToWorkOn.setEnd(actualTreatmentSettings.getEnd());
         mTreatmentToWorkOn.setPartsOfDay(actualTreatmentSettings.getPartsOfDay());
         mTreatmentToWorkOn.setPill(actualTreatmentSettings.getPill());
 
-        projectBaseHelper.updateTreatment(mTreatmentToWorkOn);
+        bankTreatment.updateTreatment(mTreatmentToWorkOn);
     }
 
     private Treatment getCurrentTreatment() {
@@ -143,8 +155,9 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
 
     private void insertNewTreatment(Treatment currentTreatment) {
-       ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
-        projectBaseHelper.insertTreatment(currentTreatment);
+        ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
+        BankTreatment bankTreatment = new BankTreatment(projectBaseHelper.getWritableDatabase());
+        bankTreatment.insertTreatment(currentTreatment);
     }
 
 
@@ -167,12 +180,12 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
     private void initializePills() {
         mProjectBaseHelper = new ProjectBaseHelper(this);
-        List<Pill> pills = new ArrayList<>();
-        try {
-            pills = mProjectBaseHelper.getPills();
-        } catch (Exception e) {
-            Log.i("Pills ! ", "problème : " + e.getMessage());
-        }
+
+        SQLiteDatabase db = mProjectBaseHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DBSchema.PillsTable.NAME, null);
+
+        PillsCursorWrapper pillsCursorWrapper = new PillsCursorWrapper(cursor);
+        List<Pill> pills = pillsCursorWrapper.getPills();
 
         PillAdapter adapter = new PillAdapter(this, pills);
         mSPillSpinner.setAdapter(adapter);
@@ -190,7 +203,7 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
 
     private void showPillScreen(Pill pill) {
-        Intent intent = new Intent(this, Pill_screen_controller.class);
+        Intent intent = new Intent(this, Pill_view_controller.class);
         intent.putExtra("pill", pill);
         startActivity(intent);
     }
@@ -200,7 +213,6 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -212,20 +224,15 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
                             endCalendar.set(selectedYear, selectedMonth, selectedDay);
                             mEnd = endCalendar;
 
-                            Calendar dt = Calendar.getInstance();
-                            dt.setTime(mBeginning.getTime());
-                            dt.add(Calendar.DATE, mDuration);
-
-                            if (mEnd.before(mBeginning) || mEnd.equals(mBeginning) || mEnd.before(dt)) {
+                            if (mEnd.before(mBeginning) || mEnd.equals(mBeginning)) {
                                 mEnd = null;
-                                throw new Exception("La date de fin ne peut pas être avant la date de début, et doit respecter la durée du traitement");
-                            } else {
-                                mTVEndDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Ajoutez 1 à selectedMonth car il commence à 0.
-                            }
+                                throw new Exception(getResources().getString(R.string.errorBeginDateAfterEnd));
+                            } else
+                                mTVEndDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // add 1 to selectedMonth because it starts at 0.
                         }
                     } catch (Exception e) {
-                        mTVEndDate.setText("Date error");
-                        Toast.makeText(getApplicationContext(), "La date de fin ne peut pas être avant la date de début", Toast.LENGTH_SHORT).show();
+                        mTVEndDate.setText(getResources().getString(R.string.dateError));
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.errorBeginDateAfterEnd), Toast.LENGTH_SHORT).show();
                     }
                 } else if (sender.equals("beginning")) {
                     Calendar beginningCalendar = Calendar.getInstance();
@@ -255,15 +262,15 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         mActualPill = (Pill) adapterView.getItemAtPosition(i);
-        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + " jours");
+        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + getResources().getString(R.string.days));
         mDuration = mActualPill.getDuration();
-        if(mTreatmentToWorkOn == null)
+        if (mTreatmentToWorkOn == null)
             mPartOfDayFragment.setCheckBoxState(mActualPill);
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-
+        //Nothing to do
     }
 
     @Override

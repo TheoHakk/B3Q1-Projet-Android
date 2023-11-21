@@ -1,6 +1,8 @@
 package be.helha.hakem_android_project.views;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
@@ -17,12 +19,14 @@ import java.util.Calendar;
 import java.util.List;
 
 import be.helha.hakem_android_project.R;
+import be.helha.hakem_android_project.db.DBSchema;
 import be.helha.hakem_android_project.db.ProjectBaseHelper;
+import be.helha.hakem_android_project.db.TreatmentsCursorWrapper;
 import be.helha.hakem_android_project.models.DayOfTreatment;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Treatment;
 
-public class Calendar_screen_controller extends AppCompatActivity {
+public class Calendar_view_controller extends AppCompatActivity {
 
     public static final int NB_DAYS_CALENDAR = 30;
     private FloatingActionButton mFABAddTreatment;
@@ -41,16 +45,11 @@ public class Calendar_screen_controller extends AppCompatActivity {
     @Override
     protected void onResume() {
         //We will update the calendar when we come back to the screen
-        //TODO : Why does it not work ?
         super.onResume();
-        try{
-            init();
-        }catch (Exception e) {
-            Log.i("Traitement : ", "C'est pas ok ! " + e.getMessage());
-        }
+        init();
     }
 
-    private void init () {
+    private void init() {
         mProjectBaseHelper = new ProjectBaseHelper(this);
         getTreatments();
         mFABAddTreatment = findViewById(R.id.FB_add_treatment);
@@ -68,9 +67,6 @@ public class Calendar_screen_controller extends AppCompatActivity {
         for (DayOfTreatment d : calendar) {
             if (d.hasTreatment()) {
                 Calendar_fragment_controller fragment = new Calendar_fragment_controller(d);
-                //I've created a specific verification, because I had a bug when i rotated the screen
-                //The fragment was added twice
-                // Check if the fragment already exists
                 Fragment existingFragment = fragmentManager.findFragmentByTag(fragment.getTag());
                 if (existingFragment == null) {
                     fragmentManager.beginTransaction()
@@ -110,7 +106,11 @@ public class Calendar_screen_controller extends AppCompatActivity {
 
     private void getTreatments() {
         try {
-            mTreatmentList = mProjectBaseHelper.getTreatments();
+            SQLiteDatabase db = mProjectBaseHelper.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT * FROM " + DBSchema.TreatmentsTable.NAME, null);
+
+            TreatmentsCursorWrapper cursorWrapper = new TreatmentsCursorWrapper(cursor, db);
+            mTreatmentList = cursorWrapper.getTreatments();
         } catch (Exception e) {
             Log.i("Traitement : ", "C'est pas ok ! " + e.getMessage());
         }
@@ -121,7 +121,7 @@ public class Calendar_screen_controller extends AppCompatActivity {
     }
 
     private void showTreatmentScreen(Treatment treatment) {
-        Intent intent = new Intent(this, Treatment_screen_controller.class);
+        Intent intent = new Intent(this, Treatment_view_controller.class);
         if (treatment != null)
             intent.putExtra("treatment", treatment);
         startActivity(intent);
@@ -132,11 +132,11 @@ public class Calendar_screen_controller extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mProjectBaseHelper.close();
-        FragmentManager fm = this.getSupportFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
         for (Fragment fragment : fm.getFragments()) {
             FragmentTransaction ft = fm.beginTransaction();
             ft.remove(fragment);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
     }
 

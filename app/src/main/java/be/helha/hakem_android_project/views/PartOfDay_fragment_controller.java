@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -21,7 +20,6 @@ public class PartOfDay_fragment_controller extends Fragment {
     private CheckBox mMorning;
     private CheckBox mNoon;
     private  CheckBox mEvening;
-    private  TextView mTVTitle;
 
 
     @Override
@@ -31,7 +29,6 @@ public class PartOfDay_fragment_controller extends Fragment {
         mMorning = view.findViewById(R.id.CB_morning);
         mNoon = view.findViewById(R.id.CB_noon);
         mEvening = view.findViewById(R.id.CB_afternoon);
-        mTVTitle = view.findViewById(R.id.TV_title_taken);
 
         return view;
     }
@@ -53,9 +50,7 @@ public class PartOfDay_fragment_controller extends Fragment {
     }
 
     public boolean checkBoxState() {
-        if(mMorning == null || mNoon == null || mEvening == null)
-            return false;
-        return true;
+        return mMorning == null || mNoon == null || mEvening == null;
     }
 
 

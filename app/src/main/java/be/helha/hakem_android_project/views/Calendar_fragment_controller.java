@@ -46,27 +46,31 @@ public class Calendar_fragment_controller extends Fragment {
         this.mDayOfTreatment = dayOfTreatment;
     }
 
+    public Calendar_fragment_controller() {
+        super(R.layout.calendar_part_fragment);
+    }
+
 
     public void updateUI() {
-        mTVDate.setText(mDayOfTreatment.getDateString());
+        if (mDayOfTreatment != null) {
+            mTVDate.setText(mDayOfTreatment.getDateString());
 
-        setTextViewVisibility(mDayOfTreatment);
+            setTextViewVisibility(mDayOfTreatment);
 
-        for (Treatment t : mDayOfTreatment.getTreatsForMorning())
-            addViewPartsOfDay(t, mLLMorning);
-        for (Treatment t : mDayOfTreatment.getTreatsForNoon())
-            addViewPartsOfDay(t, mLLNoon);
-        for (Treatment t : mDayOfTreatment.getTreatsForEvening())
-            addViewPartsOfDay(t, mLLEvening);
+            for (Treatment t : mDayOfTreatment.getTreatsForMorning())
+                addViewPartsOfDay(t, mLLMorning);
+            for (Treatment t : mDayOfTreatment.getTreatsForNoon())
+                addViewPartsOfDay(t, mLLNoon);
+            for (Treatment t : mDayOfTreatment.getTreatsForEvening())
+                addViewPartsOfDay(t, mLLEvening);
+        }
     }
 
     private void init(View view) {
         mTVDate = view.findViewById(R.id.TV_Date);
-
         mTVMorning = view.findViewById(R.id.TV_Morning);
         mTVNoon = view.findViewById(R.id.TV_Noon);
         mTVEvening = view.findViewById(R.id.TV_Evening);
-
         mLLMorning = view.findViewById(R.id.LL_Morning);
         mLLNoon = view.findViewById(R.id.LL_Noon);
         mLLEvening = view.findViewById(R.id.LL_Evening);
@@ -81,7 +85,7 @@ public class Calendar_fragment_controller extends Fragment {
     }
 
     private void showTreatmentScreen(Treatment treatment) {
-        Intent i = new Intent(getContext(), Treatment_screen_controller.class);
+        Intent i = new Intent(getContext(), Treatment_view_controller.class);
         i.putExtra("treatment", treatment);
         startActivity(i);
     }
