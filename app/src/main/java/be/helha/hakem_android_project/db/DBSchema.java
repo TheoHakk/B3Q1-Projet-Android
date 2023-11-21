@@ -20,7 +20,7 @@ public abstract class DBSchema {
             public static final String ID = "Id";
             public static final String PILLID = "PillId";
             public static final String BEGINNING = "Beginning";
-            public static final String END = "Ending";
+            public static final String ENDING = "Ending";
             public static final String MORNING = "Morning";
             public static final String NOON = "Noon";
             public static final String EVENING = "Evening";

@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,7 +46,7 @@ public class ProjectBaseHelper extends SQLiteOpenHelper {
                 DBSchema.TreatmentsTable.Cols.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 DBSchema.TreatmentsTable.Cols.PILLID + " INTEGER NOT NULL, " +
                 DBSchema.TreatmentsTable.Cols.BEGINNING + " TEXT NOT NULL, " +
-                DBSchema.TreatmentsTable.Cols.END + " TEXT NOT NULL, " +
+                DBSchema.TreatmentsTable.Cols.ENDING + " TEXT NOT NULL, " +
                 DBSchema.TreatmentsTable.Cols.MORNING + " INTEGER NOT NULL, " +
                 DBSchema.TreatmentsTable.Cols.NOON + " INTEGER NOT NULL, " +
                 DBSchema.TreatmentsTable.Cols.EVENING + " INTEGER NOT NULL )";
@@ -86,34 +88,38 @@ public class ProjectBaseHelper extends SQLiteOpenHelper {
                 int id = cursor.getInt(cursor.getColumnIndex(DBSchema.TreatmentsTable.Cols.ID));
                 int pillId = cursor.getInt(cursor.getColumnIndex(DBSchema.TreatmentsTable.Cols.PILLID));
                 String beginningString = cursor.getString(cursor.getColumnIndex(DBSchema.TreatmentsTable.Cols.BEGINNING));
-                String endString = cursor.getString(cursor.getColumnIndex(DBSchema.TreatmentsTable.Cols.END));
+                String endString = cursor.getString(cursor.getColumnIndex(DBSchema.TreatmentsTable.Cols.ENDING));
                 int morning = cursor.getInt(cursor.getColumnIndex(DBSchema.TreatmentsTable.Cols.MORNING));
                 int noon = cursor.getInt(cursor.getColumnIndex(DBSchema.TreatmentsTable.Cols.NOON));
                 int evening = cursor.getInt(cursor.getColumnIndex(DBSchema.TreatmentsTable.Cols.EVENING));
 
-                Pill pill = getSpecificPill(pillId);
-                List<PartOfDay> partsOfDay = new ArrayList<>();
-
-                if (morning == 1)
-                    partsOfDay.add(PartOfDay.MORNING);
-                if (noon == 1)
-                    partsOfDay.add(PartOfDay.NOON);
-                if (evening == 1)
-                    partsOfDay.add(PartOfDay.EVENING);
-
-
-                Calendar beginning = convertStringToCalendar(beginningString);
-                Calendar end = convertStringToCalendar(endString);
-
-                Treatment treatment = new Treatment(pill, partsOfDay, beginning, end);
-                treatment.setId(id);
-
-                treatments.add(treatment);
+                treatments.add(createTreatWithObtainedInformation(id, pillId, beginningString, endString, morning, noon, evening));
             } while (cursor.moveToNext());
         }
 
         cursor.close();
         return treatments;
+    }
+
+    @NonNull
+    private Treatment createTreatWithObtainedInformation(int id, int pillId, String beginningString, String endString, int morning, int noon, int evening) throws ParseException {
+        Pill pill = getSpecificPill(pillId);
+        List<PartOfDay> partsOfDay = new ArrayList<>();
+
+        if (morning == 1)
+            partsOfDay.add(PartOfDay.MORNING);
+        if (noon == 1)
+            partsOfDay.add(PartOfDay.NOON);
+        if (evening == 1)
+            partsOfDay.add(PartOfDay.EVENING);
+
+
+        Calendar beginning = convertStringToCalendar(beginningString);
+        Calendar end = convertStringToCalendar(endString);
+
+        Treatment treatment = new Treatment(pill, partsOfDay, beginning, end);
+        treatment.setId(id);
+        return treatment;
     }
 
     private Calendar convertStringToCalendar(String dateString) throws ParseException {
@@ -132,7 +138,7 @@ public class ProjectBaseHelper extends SQLiteOpenHelper {
         String query = "INSERT INTO " + DBSchema.TreatmentsTable.NAME + "(" +
                 DBSchema.TreatmentsTable.Cols.PILLID + ", " +
                 DBSchema.TreatmentsTable.Cols.BEGINNING + ", " +
-                DBSchema.TreatmentsTable.Cols.END + ", " +
+                DBSchema.TreatmentsTable.Cols.ENDING + ", " +
                 DBSchema.TreatmentsTable.Cols.MORNING + ", " +
                 DBSchema.TreatmentsTable.Cols.NOON + ", " +
                 DBSchema.TreatmentsTable.Cols.EVENING + " ) VALUES (?, ?, ?, ?, ?, ?);";
@@ -154,7 +160,15 @@ public class ProjectBaseHelper extends SQLiteOpenHelper {
 
     public void updateTreatment(Treatment treatmentToWorkOn) {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "UPDATE Treatment SET PillId = ?, Beginning = ?, Ending = ?, Morning = ?, Noon = ?, Evening = ? WHERE Id = ?";
+        String query = "UPDATE " + DBSchema.TreatmentsTable.NAME +
+                " SET " + DBSchema.TreatmentsTable.Cols.PILLID + " = ?," +
+                DBSchema.TreatmentsTable.Cols.BEGINNING + " = ?," +
+                DBSchema.TreatmentsTable.Cols.ENDING + " = ?," +
+                DBSchema.TreatmentsTable.Cols.MORNING + " = ?," +
+                DBSchema.TreatmentsTable.Cols.NOON + " = ?," +
+                DBSchema.TreatmentsTable.Cols.EVENING + " = ?" +
+                " WHERE " + DBSchema.TreatmentsTable.Cols.ID + " = ?";
+
         String[] args = {
                 String.valueOf(treatmentToWorkOn.getPill().getId()),
                 treatmentToWorkOn.getBeginningString(),
@@ -173,19 +187,37 @@ public class ProjectBaseHelper extends SQLiteOpenHelper {
 
     public void insertPill(Pill pill) {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "INSERT INTO Pills (Name, Duration, Morning, Noon, Evening) VALUES (?, ?, ?, ?, ?)";
+
+        String query = "INSERT INTO " +
+                DBSchema.PillsTable.NAME + " ( " +
+                DBSchema.PillsTable.Cols.NAME + ", " +
+                DBSchema.PillsTable.Cols.DURATION + ", " +
+                DBSchema.PillsTable.Cols.MORNING + ", " +
+                DBSchema.PillsTable.Cols.NOON + ", " +
+                DBSchema.PillsTable.Cols.EVENING + ") VALUES (?, ?, ?, ?, ?)";
+
         String[] args = {
                 pill.getName(),
                 String.valueOf(pill.getDuration()),
                 String.valueOf(pill.getPartsOfDay().contains(PartOfDay.MORNING) ? 1 : 0),
                 String.valueOf(pill.getPartsOfDay().contains(PartOfDay.NOON) ? 1 : 0),
                 String.valueOf(pill.getPartsOfDay().contains(PartOfDay.EVENING) ? 1 : 0)};
+
         db.execSQL(query, args);
     }
 
     public void updatePill(Pill pill) {
         SQLiteDatabase db = getWritableDatabase();
-        String query = "UPDATE Pills SET Name = ?, Duration = ?, Morning = ?, Noon = ?, Evening = ? WHERE Id = ?";
+
+        String query = "UPDATE " +
+                DBSchema.PillsTable.NAME + " SET " +
+                DBSchema.PillsTable.Cols.NAME + " = ?, " +
+                DBSchema.PillsTable.Cols.DURATION + " = ?, " +
+                DBSchema.PillsTable.Cols.MORNING + " = ?, " +
+                DBSchema.PillsTable.Cols.NOON + " = ?, " +
+                DBSchema.PillsTable.Cols.EVENING + " = ? " +
+                "WHERE " + DBSchema.PillsTable.Cols.ID + " = ?";
+
         String[] args = {
                 pill.getName(),
                 String.valueOf(pill.getDuration()),
