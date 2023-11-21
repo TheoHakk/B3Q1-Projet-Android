@@ -35,7 +35,6 @@ public class Calendar_screen_controller extends AppCompatActivity {
     TreatmentBaseHelper treatmentBaseHelper;
     List<Treatment> treatmentList;
     List<DayOfTreatment> calendar;
-
     LinearLayout mContainer;
 
     @Override
@@ -48,11 +47,16 @@ public class Calendar_screen_controller extends AppCompatActivity {
     @Override
     protected void onResume() {
         //We will update the calendar when we come back to the screen
+        //TODO : Why does it not work ?
         super.onResume();
-        init();
+        try{
+            init();
+        }catch (Exception e) {
+            Log.i("Traitement : ", "C'est pas ok ! " + e.getMessage());
+        }
     }
 
-    private void init() {
+    private void init () {
         getTreatments();
         addTreatment = findViewById(R.id.FB_add_treatment);
         mContainer = findViewById(R.id.container);
@@ -64,14 +68,20 @@ public class Calendar_screen_controller extends AppCompatActivity {
 
     private void updateUI() {
         mContainer.removeAllViews();
-        //Insert for each day a fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        // Insert for each day a fragment
         for (DayOfTreatment d : calendar) {
             if (d.hasTreatment()) {
                 Calendar_fragment_controller fragment = new Calendar_fragment_controller(d);
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(mContainer.getId(), fragment)
-                        .commit();
+                //I've created a specific verification, because I had a bug when i rotated the screen
+                //The fragment was added twice
+                // Check if the fragment already exists
+                Fragment existingFragment = fragmentManager.findFragmentByTag(fragment.getTag());
+                if (existingFragment == null) {
+                    fragmentManager.beginTransaction()
+                            .add(mContainer.getId(), fragment, fragment.getTag())
+                            .commit();
+                }
             }
         }
     }
@@ -109,7 +119,6 @@ public class Calendar_screen_controller extends AppCompatActivity {
             treatmentList = treatmentBaseHelper.getTreatments(this);
         } catch (Exception e) {
             Log.i("Traitement : ", "C'est pas ok ! " + e.getMessage());
-
         }
     }
 

@@ -21,13 +21,10 @@ import be.helha.hakem_android_project.models.Treatment;
 
 public class Calendar_fragment_controller extends Fragment {
     DayOfTreatment dayOfTreatment;
-
     TextView date;
-
     TextView tvMorning;
     TextView tvNoon;
     TextView tvEvening;
-
     LinearLayout llMorning;
     LinearLayout llNoon;
     LinearLayout llEvening;
@@ -52,6 +49,7 @@ public class Calendar_fragment_controller extends Fragment {
         this.dayOfTreatment = dayOfTreatment;
     }
 
+
     public void updateUI() {
         date.setText(dayOfTreatment.getDateString());
 
@@ -67,9 +65,11 @@ public class Calendar_fragment_controller extends Fragment {
 
     private void init(View view) {
         date = view.findViewById(R.id.TV_Date);
+
         tvMorning = view.findViewById(R.id.TV_Morning);
         tvNoon = view.findViewById(R.id.TV_Noon);
         tvEvening = view.findViewById(R.id.TV_Evening);
+
         llMorning = view.findViewById(R.id.LL_Morning);
         llNoon = view.findViewById(R.id.LL_Noon);
         llEvening = view.findViewById(R.id.LL_Evening);
@@ -91,10 +91,11 @@ public class Calendar_fragment_controller extends Fragment {
 
     private void setTextViewVisibility(DayOfTreatment dayOfTreatment) {
         if (dayOfTreatment.getTreatsForMorning().isEmpty())
-            tvEvening.setVisibility(View.GONE);
+            tvMorning.setVisibility(View.GONE);
         if (dayOfTreatment.getTreatsForNoon().isEmpty())
             tvNoon.setVisibility(View.GONE);
         if (dayOfTreatment.getTreatsForEvening().isEmpty())
             tvEvening.setVisibility(View.GONE);
     }
+
 }

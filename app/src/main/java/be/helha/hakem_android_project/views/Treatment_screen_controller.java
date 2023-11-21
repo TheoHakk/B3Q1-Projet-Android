@@ -74,8 +74,6 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
             treatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
         if (treatmentToWorkOn != null)
             showTreatmentInformations();
-
-
     }
 
     private void showTreatmentInformations() {
@@ -260,7 +258,8 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
         actualPill = (Pill) adapterView.getItemAtPosition(i);
         recommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + actualPill.getDuration() + " jours");
         duration = actualPill.getDuration();
-        partOfDayFragment.setCheckBoxState(actualPill);
+        if(treatmentToWorkOn == null)
+            partOfDayFragment.setCheckBoxState(actualPill);
     }
 
     @Override
