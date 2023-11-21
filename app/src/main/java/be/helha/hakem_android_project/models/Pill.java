@@ -5,54 +5,54 @@ import java.util.List;
 
 public class Pill implements Serializable {
 
-    private String name;
-    private int duration;
-    private List<PartOfDay> partOfDays;
-    private int id;
+    private String mName;
+    private int mDuration;
+    private List<PartOfDay> mPartsOfDay;
+    private int mId;
 
-    public Pill(String name, int duration, List<PartOfDay> partOfDays) {
-        this.name = name;
-        this.duration = duration;
-        this.partOfDays = partOfDays;
+    public Pill(String mName, int mDuration, List<PartOfDay> partOfDays) {
+        this.mName = mName;
+        this.mDuration = mDuration;
+        this.mPartsOfDay = partOfDays;
     }
 
 
     public String getName() {
-        return name;
+        return mName;
     }
 
     public int getDuration() {
-        return duration;
+        return mDuration;
     }
 
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
+    public List<PartOfDay> getPartsOfDay() {
+        return mPartsOfDay;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String mName) {
+        this.mName = mName;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
+    public void setDuration(int mDuration) {
+        this.mDuration = mDuration;
     }
 
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
+    public void setPartsOfDay(List<PartOfDay> mPartsOfDay) {
+        this.mPartsOfDay = mPartsOfDay;
     }
 
     public int getId() {
-        return id;
+        return mId;
     }
 
     public int setId(int id) {
-        return this.id = id;
+        return this.mId = id;
     }
 
 
     public String getStringPartsOfDay() {
         String partsOfDay = "";
-        for (PartOfDay partOfDay : this.partOfDays)
+        for (PartOfDay partOfDay : this.mPartsOfDay)
             partsOfDay += partOfDay.toString() + " ";
         return partsOfDay;
     }

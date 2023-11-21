@@ -11,19 +11,19 @@ import androidx.fragment.app.FragmentManager;
 
 
 import be.helha.hakem_android_project.R;
-import be.helha.hakem_android_project.db.PillsBaseHelper;
+import be.helha.hakem_android_project.db.ProjectBaseHelper;
 import be.helha.hakem_android_project.models.Pill;
 
 public class Pill_screen_controller extends AppCompatActivity {
 
-    Button upDays;
-    Button downDays;
-    Button validate;
-    TextView tv_duration;
-    EditText name;
-    int duration;
-    PartOfDay_fragment_controller partOfDayFragment;
-    Pill pillToWorkOn;
+    private Button mBUpDays;
+    private Button mBDownDays;
+    private Button mBValidate;
+    private  TextView mTVDuration;
+    private EditText mETName;
+    private PartOfDay_fragment_controller mPartOfDayFragment;
+    private Pill mPillToWorkOn;
+    private int mDuration;
 
 
     @Override
@@ -37,83 +37,87 @@ public class Pill_screen_controller extends AppCompatActivity {
 
     private void verifyIntent() {
         if (getIntent().getExtras() != null)
-            pillToWorkOn = (Pill) getIntent().getSerializableExtra("pill");
-        if (pillToWorkOn != null)
+            mPillToWorkOn = (Pill) getIntent().getSerializableExtra("pill");
+        if (mPillToWorkOn != null)
             showPillInformations();
     }
 
     private void showPillInformations() {
-        name.setText(pillToWorkOn.getName());
-        duration = pillToWorkOn.getDuration();
-        tv_duration.setText(String.valueOf(pillToWorkOn.getDuration()));
+        mETName.setText(mPillToWorkOn.getName());
+        mDuration = mPillToWorkOn.getDuration();
+        mTVDuration.setText(String.valueOf(mPillToWorkOn.getDuration()));
 
         //Because of the fragment commit, we need to wait the fragment has instantiate its views
         Thread thread = new Thread(() -> {
-            while (!partOfDayFragment.checkBoxState()) {
+            while (!mPartOfDayFragment.checkBoxState()) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            partOfDayFragment.setCheckBoxState(pillToWorkOn);
+            mPartOfDayFragment.setCheckBoxState(mPillToWorkOn);
         });
         thread.start();
     }
 
     private void init() {
-        tv_duration = findViewById(R.id.TV_duration);
-        duration = 0;
-        upDays = findViewById(R.id.B_up_days);
-        downDays = findViewById(R.id.B_down_days);
-        validate = findViewById(R.id.B_pill_validate);
-        name = findViewById(R.id.E_pill_name);
+        mTVDuration = findViewById(R.id.TV_duration);
+        mDuration = 0;
+        mBUpDays = findViewById(R.id.B_up_days);
+        mBDownDays = findViewById(R.id.B_down_days);
+        mBValidate = findViewById(R.id.B_pill_validate);
+        mETName = findViewById(R.id.E_pill_name);
         setActions();
     }
+
     private void putFragments() {
         FragmentManager fm = getSupportFragmentManager();
-        partOfDayFragment = (PartOfDay_fragment_controller) fm.findFragmentById(R.id.fragment_container);
-        if (partOfDayFragment == null) {
-            partOfDayFragment = new PartOfDay_fragment_controller();
+        mPartOfDayFragment = (PartOfDay_fragment_controller) fm.findFragmentById(R.id.fragment_container);
+        if (mPartOfDayFragment == null) {
+            mPartOfDayFragment = new PartOfDay_fragment_controller();
             fm.beginTransaction()
-                    .add(R.id.fragment_container, partOfDayFragment)
+                    .add(R.id.fragment_container, mPartOfDayFragment)
                     .commit();
         }
     }
+
     private void setActions() {
-        upDays.setOnClickListener(v -> {
-            if (duration < 30)
-                duration++;
-            tv_duration.setText(String.valueOf(duration));
+        mBUpDays.setOnClickListener(v -> {
+            if (mDuration < 30)
+                mDuration++;
+            mTVDuration.setText(String.valueOf(mDuration));
         });
-        downDays.setOnClickListener(v -> {
-            if (duration > 0)
-                duration--;
-            tv_duration.setText(String.valueOf(duration));
+        mBDownDays.setOnClickListener(v -> {
+            if (mDuration > 0)
+                mDuration--;
+            mTVDuration.setText(String.valueOf(mDuration));
         });
-        validate.setOnClickListener(v -> validatePill());
+        mBValidate.setOnClickListener(v -> validatePill());
     }
+
     private void validatePill() {
-        if(pillToWorkOn != null)
+        if (mPillToWorkOn != null)
             updatePill();
         else
             createNewPill();
         finish();
     }
+
     private void createNewPill() {
         Pill pill = null;
         try {
-            if (name.getText().toString().isEmpty() || duration == 0)
+            if (mETName.getText().toString().isEmpty() || mDuration == 0)
                 throw new Exception("Name or duration is empty");
-            pill = new Pill(name.getText().toString(), duration, partOfDayFragment.getPartsOfDay());
+            pill = new Pill(mETName.getText().toString(), mDuration, mPartOfDayFragment.getPartsOfDay());
         } catch (Exception e) {
             Log.i("ERROR", "validatePill: " + e.getMessage());
             e.getStackTrace();
         }
-        if (pill != null){
-            PillsBaseHelper pillsBaseHelper = new PillsBaseHelper(this);
+        if (pill != null) {
+            ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
             try {
-                pillsBaseHelper.insertPill(pill);
+                projectBaseHelper.insertPill(pill);
             } catch (Exception e) {
                 Log.i("ERROR", "validatePill: " + e.getMessage());
             }
@@ -122,12 +126,12 @@ public class Pill_screen_controller extends AppCompatActivity {
     }
 
     private void updatePill() {
-        PillsBaseHelper pillsBaseHelper = new PillsBaseHelper(this);
+        ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
         try {
-           pillToWorkOn.setName(name.getText().toString());
-            pillToWorkOn.setDuration(duration);
-            pillToWorkOn.setPartOfDays(partOfDayFragment.getPartsOfDay());
-            pillsBaseHelper.updatePill(pillToWorkOn);
+            mPillToWorkOn.setName(mETName.getText().toString());
+            mPillToWorkOn.setDuration(mDuration);
+            mPillToWorkOn.setPartsOfDay(mPartOfDayFragment.getPartsOfDay());
+            projectBaseHelper.updatePill(mPillToWorkOn);
         } catch (Exception e) {
             Log.i("ERROR", "updatePill: " + e.getMessage());
         }

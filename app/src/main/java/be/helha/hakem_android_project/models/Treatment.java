@@ -1,87 +1,83 @@
 package be.helha.hakem_android_project.models;
 
-import android.util.Log;
-
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.List;
 
 public class Treatment implements Serializable {
 
-    private int id;
-    private Pill pill;
-    private List<PartOfDay> partsOfDay;
-    private Calendar beginning;
-    private Calendar end;
+    private int mId;
+    private Pill mPill;
+    private List<PartOfDay> mPartsOfDay;
+    private Calendar mBeginning;
+    private Calendar mEnd;
 
-    public Treatment(Pill pill, List<PartOfDay> partsOfDay, Calendar beginning, Calendar end) {
-        this.pill = pill;
-        this.partsOfDay = partsOfDay;
-        this.beginning = beginning;
-        this.end = end;
+    public Treatment(Pill pill, List<PartOfDay> partsOfDay, Calendar mBeginning, Calendar end) {
+        this.mPill = pill;
+        this.mPartsOfDay = partsOfDay;
+        this.mBeginning = mBeginning;
+        this.mEnd = end;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int mId) {
+        this.mId = mId;
     }
 
     public int getId() {
-        return this.id;
+        return this.mId;
     }
 
-    public void setPill(Pill pill) {
-        this.pill = pill;
+    public void setPill(Pill mPill) {
+        this.mPill = mPill;
     }
 
-    public void setPartsOfDay(List<PartOfDay> partsOfDay) {
-        this.partsOfDay = partsOfDay;
+    public void setPartsOfDay(List<PartOfDay> mPartsOfDay) {
+        this.mPartsOfDay = mPartsOfDay;
     }
 
-    public void setBeginning(Calendar beginning) {
-        this.beginning = beginning;
+    public void setBeginning(Calendar mBeginning) {
+        this.mBeginning = mBeginning;
     }
 
-    public void setEnd(Calendar end) {
-        this.end = end;
+    public void setEnd(Calendar mEnd) {
+        this.mEnd = mEnd;
     }
 
     public Pill getPill() {
-        return pill;
+        return mPill;
     }
 
     public List<PartOfDay> getPartsOfDay() {
-        return partsOfDay;
+        return mPartsOfDay;
     }
 
     public Calendar getBeginning() {
-        return beginning;
+        return mBeginning;
     }
 
     public Calendar getEnd() {
-        return end;
+        return mEnd;
     }
 
 
     public String getBeginningString() {
-        int day = beginning.get(Calendar.DAY_OF_MONTH);
-        int month = beginning.get(Calendar.MONTH) + 1; //We add 1 for getting the real month
-        int year = beginning.get(Calendar.YEAR);
+        int day = mBeginning.get(Calendar.DAY_OF_MONTH);
+        int month = mBeginning.get(Calendar.MONTH) + 1; //We add 1 for getting the real month
+        int year = mBeginning.get(Calendar.YEAR);
         //We need to format the date to a string with the format dd/mm/yyyy
         return day + "/" + month + "/" + year;
     }
 
     public String getEndString() {
-        int day = end.get(Calendar.DAY_OF_MONTH);
-        int month = end.get(Calendar.MONTH) + 1;
-        int year = end.get(Calendar.YEAR);
-        String sdate = day + "/" + month + "/" + year;
-        return sdate;
+        int day = mEnd.get(Calendar.DAY_OF_MONTH);
+        int month = mEnd.get(Calendar.MONTH) + 1;
+        int year = mEnd.get(Calendar.YEAR);
+        return day + "/" + month + "/" + year;
     }
 
 
     public boolean containsTheDate(Calendar date) {
-
-        return date.getTime().compareTo(beginning.getTime()) > 0 && date.getTime().compareTo(end.getTime()) <= 0;
+        return date.getTime().compareTo(mBeginning.getTime()) > 0 && date.getTime().compareTo(mEnd.getTime()) <= 0;
     }
 
 }

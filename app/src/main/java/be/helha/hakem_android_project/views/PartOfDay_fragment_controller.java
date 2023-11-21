@@ -18,21 +18,20 @@ import be.helha.hakem_android_project.models.Pill;
 
 public class PartOfDay_fragment_controller extends Fragment {
 
-    CheckBox morning;
-    CheckBox noon;
-    CheckBox evening;
-
-    TextView title;
+    private CheckBox mMorning;
+    private CheckBox mNoon;
+    private  CheckBox mEvening;
+    private  TextView mTVTitle;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.part_rb_fragment, container, false);
 
-        morning = view.findViewById(R.id.CB_morning);
-        noon = view.findViewById(R.id.CB_noon);
-        evening = view.findViewById(R.id.CB_afternoon);
-        title = view.findViewById(R.id.TV_title_taken);
+        mMorning = view.findViewById(R.id.CB_morning);
+        mNoon = view.findViewById(R.id.CB_noon);
+        mEvening = view.findViewById(R.id.CB_afternoon);
+        mTVTitle = view.findViewById(R.id.TV_title_taken);
 
         return view;
     }
@@ -40,11 +39,11 @@ public class PartOfDay_fragment_controller extends Fragment {
 
     public List<PartOfDay> getPartsOfDay(){
         List<PartOfDay> partsOfDay = new ArrayList<>();
-        if(morning.isChecked())
+        if(mMorning.isChecked())
             partsOfDay.add(PartOfDay.MORNING);
-        if(noon.isChecked())
+        if(mNoon.isChecked())
             partsOfDay.add(PartOfDay.NOON);
-        if(evening.isChecked())
+        if(mEvening.isChecked())
             partsOfDay.add(PartOfDay.EVENING);
         return partsOfDay;
     }
@@ -54,7 +53,7 @@ public class PartOfDay_fragment_controller extends Fragment {
     }
 
     public boolean checkBoxState() {
-        if(morning == null || noon == null || evening == null)
+        if(mMorning == null || mNoon == null || mEvening == null)
             return false;
         return true;
     }
@@ -62,20 +61,20 @@ public class PartOfDay_fragment_controller extends Fragment {
 
     public void setCheckBoxState(Pill actualPill) {
 
-        morning.setChecked(false);
-        noon.setChecked(false);
-        evening.setChecked(false);
+        mMorning.setChecked(false);
+        mNoon.setChecked(false);
+        mEvening.setChecked(false);
 
-        for(PartOfDay partOfDay : actualPill.getPartOfDays()){
+        for(PartOfDay partOfDay : actualPill.getPartsOfDay()){
             switch (partOfDay){
                 case MORNING:
-                    morning.setChecked(true);
+                    mMorning.setChecked(true);
                     break;
                 case NOON:
-                    noon.setChecked(true);
+                    mNoon.setChecked(true);
                     break;
                 case EVENING:
-                    evening.setChecked(true);
+                    mEvening.setChecked(true);
                     break;
             }
         }
@@ -83,20 +82,20 @@ public class PartOfDay_fragment_controller extends Fragment {
 
     public void setCheckBoxState(List<PartOfDay> partsOfDay) {
 
-        morning.setChecked(false);
-        noon.setChecked(false);
-        evening.setChecked(false);
+        mMorning.setChecked(false);
+        mNoon.setChecked(false);
+        mEvening.setChecked(false);
 
         for(PartOfDay partOfDay : partsOfDay){
             switch (partOfDay){
                 case MORNING:
-                    morning.setChecked(true);
+                    mMorning.setChecked(true);
                     break;
                 case NOON:
-                    noon.setChecked(true);
+                    mNoon.setChecked(true);
                     break;
                 case EVENING:
-                    evening.setChecked(true);
+                    mEvening.setChecked(true);
                     break;
             }
         }

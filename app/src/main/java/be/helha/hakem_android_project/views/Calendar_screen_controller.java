@@ -3,27 +3,21 @@ package be.helha.hakem_android_project.views;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
 
 import be.helha.hakem_android_project.R;
-import be.helha.hakem_android_project.db.TreatmentBaseHelper;
+import be.helha.hakem_android_project.db.ProjectBaseHelper;
 import be.helha.hakem_android_project.models.DayOfTreatment;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Treatment;
@@ -31,11 +25,11 @@ import be.helha.hakem_android_project.models.Treatment;
 public class Calendar_screen_controller extends AppCompatActivity {
 
     public static final int NB_DAYS_CALENDAR = 30;
-    FloatingActionButton addTreatment;
-    TreatmentBaseHelper treatmentBaseHelper;
-    List<Treatment> treatmentList;
-    List<DayOfTreatment> calendar;
-    LinearLayout mContainer;
+    private FloatingActionButton mFABAddTreatment;
+    private ProjectBaseHelper mProjectBaseHelper;
+    private List<Treatment> mTreatmentList;
+    private List<DayOfTreatment> calendar;
+    private LinearLayout mContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +51,9 @@ public class Calendar_screen_controller extends AppCompatActivity {
     }
 
     private void init () {
+        mProjectBaseHelper = new ProjectBaseHelper(this);
         getTreatments();
-        addTreatment = findViewById(R.id.FB_add_treatment);
+        mFABAddTreatment = findViewById(R.id.FB_add_treatment);
         mContainer = findViewById(R.id.container);
         initializeCalendar();
         updateUI();
@@ -102,7 +97,7 @@ public class Calendar_screen_controller extends AppCompatActivity {
         //We will search for every treatment that is in the calendar
         //and add it to the corresponding day, and the corresponded part of the day
         for (DayOfTreatment d : calendar)
-            for (Treatment t : treatmentList)
+            for (Treatment t : mTreatmentList)
                 if (t.containsTheDate(d.getDate())) {
                     if (t.getPartsOfDay().contains(PartOfDay.MORNING))
                         d.addTreatForMorning(t);
@@ -114,16 +109,15 @@ public class Calendar_screen_controller extends AppCompatActivity {
     }
 
     private void getTreatments() {
-        treatmentBaseHelper = new TreatmentBaseHelper(this);
         try {
-            treatmentList = treatmentBaseHelper.getTreatments(this);
+            mTreatmentList = mProjectBaseHelper.getTreatments();
         } catch (Exception e) {
             Log.i("Traitement : ", "C'est pas ok ! " + e.getMessage());
         }
     }
 
     private void setActions() {
-        addTreatment.setOnClickListener(v -> showTreatmentScreen(null));
+        mFABAddTreatment.setOnClickListener(v -> showTreatmentScreen(null));
     }
 
     private void showTreatmentScreen(Treatment treatment) {
@@ -133,10 +127,17 @@ public class Calendar_screen_controller extends AppCompatActivity {
         startActivity(intent);
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        treatmentBaseHelper.close();
+        mProjectBaseHelper.close();
+        FragmentManager fm = this.getSupportFragmentManager();
+        for (Fragment fragment : fm.getFragments()) {
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.remove(fragment);
+            ft.commit();
+        }
     }
 
 }

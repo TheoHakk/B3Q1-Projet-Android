@@ -24,29 +24,28 @@ import java.util.List;
 import java.util.Objects;
 
 import be.helha.hakem_android_project.R;
-import be.helha.hakem_android_project.db.PillsBaseHelper;
-import be.helha.hakem_android_project.db.TreatmentBaseHelper;
+import be.helha.hakem_android_project.db.ProjectBaseHelper;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
 import be.helha.hakem_android_project.models.Treatment;
 
 public class Treatment_screen_controller extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    Button openDatePickerButtonBeginning;
-    Button openDatePickerButtonEnd;
-    Button treatmentValidation;
-    FloatingActionButton addPill;
-    FloatingActionButton modifyPill;
-    TextView beginningDate;
-    TextView endDate;
-    TextView recommended_duration;
-    Calendar beginning;
-    Calendar end;
-    Treatment treatmentToWorkOn;
-    Spinner pillSpinner;
-    PartOfDay_fragment_controller partOfDayFragment;
-    PillsBaseHelper pillsBaseHelper;
-    Pill actualPill;
-    int duration;
+    private Button mBOpenDatePickerButtonBeginning;
+    private Button mBOpenDatePickerButtonEnd;
+    private Button mBTreatmentValidation;
+    private FloatingActionButton mFABAddPill;
+    private FloatingActionButton mFABModifyPill;
+    private TextView mTVBeginningDate;
+    private TextView mTVEndDate;
+    private TextView mTVRecommended_duration;
+    private Spinner mSPillSpinner;
+    private PartOfDay_fragment_controller mPartOfDayFragment;
+    private ProjectBaseHelper mProjectBaseHelper;
+    private Pill mActualPill;
+    private int mDuration;
+    private Calendar mBeginning;
+    private Calendar mEnd;
+    private Treatment mTreatmentToWorkOn;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,31 +70,31 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
     private void verifyIntent() {
         if (getIntent().getExtras() != null)
-            treatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
-        if (treatmentToWorkOn != null)
+            mTreatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
+        if (mTreatmentToWorkOn != null)
             showTreatmentInformations();
     }
 
     private void showTreatmentInformations() {
-        beginning = treatmentToWorkOn.getBeginning();
-        end = treatmentToWorkOn.getEnd();
-        actualPill = treatmentToWorkOn.getPill();
-        duration = actualPill.getDuration();
-        beginningDate.setText(beginning.get(Calendar.DAY_OF_MONTH) + "/" + (beginning.get(Calendar.MONTH) + 1) + "/" + beginning.get(Calendar.YEAR));
-        endDate.setText(end.get(Calendar.DAY_OF_MONTH) + "/" + (end.get(Calendar.MONTH) + 1) + "/" + end.get(Calendar.YEAR));
-        recommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + actualPill.getDuration() + " jours");
+        mBeginning = mTreatmentToWorkOn.getBeginning();
+        mEnd = mTreatmentToWorkOn.getEnd();
+        mActualPill = mTreatmentToWorkOn.getPill();
+        mDuration = mActualPill.getDuration();
+        mTVBeginningDate.setText(mBeginning.get(Calendar.DAY_OF_MONTH) + "/" + (mBeginning.get(Calendar.MONTH) + 1) + "/" + mBeginning.get(Calendar.YEAR));
+        mTVEndDate.setText(mEnd.get(Calendar.DAY_OF_MONTH) + "/" + (mEnd.get(Calendar.MONTH) + 1) + "/" + mEnd.get(Calendar.YEAR));
+        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + " jours");
 
-        pillSpinner.setSelection(actualPill.getId() - 1);
+        mSPillSpinner.setSelection(mActualPill.getId() - 1);
         //Because of the fragment commit, we need to wait the fragment has instantiate its views
         Thread thread = new Thread(() -> {
-            while (!partOfDayFragment.checkBoxState()) {
+            while (!mPartOfDayFragment.checkBoxState()) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            partOfDayFragment.setCheckBoxState(treatmentToWorkOn.getPartsOfDay());
+            mPartOfDayFragment.setCheckBoxState(mTreatmentToWorkOn.getPartsOfDay());
         });
         thread.start();
     }
@@ -103,7 +102,7 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     private void createNewTreatment() {
         Treatment treatmentToInsert = getCurrentTreatment();
         if (treatmentToInsert != null) {
-            if (treatmentToWorkOn != null)
+            if (mTreatmentToWorkOn != null)
                 updateTreatment(treatmentToInsert);
             else
                 insertNewTreatment(treatmentToInsert);
@@ -113,29 +112,29 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     }
 
     private void updateTreatment(Treatment actualTreatmentSettings) {
-        TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
-        treatmentToWorkOn.setBeginning(actualTreatmentSettings.getBeginning());
-        treatmentToWorkOn.setEnd(actualTreatmentSettings.getEnd());
-        treatmentToWorkOn.setPartsOfDay(actualTreatmentSettings.getPartsOfDay());
-        treatmentToWorkOn.setPill(actualTreatmentSettings.getPill());
+        ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
+        mTreatmentToWorkOn.setBeginning(actualTreatmentSettings.getBeginning());
+        mTreatmentToWorkOn.setEnd(actualTreatmentSettings.getEnd());
+        mTreatmentToWorkOn.setPartsOfDay(actualTreatmentSettings.getPartsOfDay());
+        mTreatmentToWorkOn.setPill(actualTreatmentSettings.getPill());
 
-        treatmentBaseHelper.updateTreatment(treatmentToWorkOn);
+        projectBaseHelper.updateTreatment(mTreatmentToWorkOn);
     }
 
     private Treatment getCurrentTreatment() {
         Treatment treatmentToInsert = null;
         try {
-            Pill actualPill = (Pill) pillSpinner.getSelectedItem();
-            List<PartOfDay> partsOfDay = partOfDayFragment.getPartsOfDay();
-            Calendar beginning = this.beginning;
-            Calendar end = this.end;
+            Pill actualPill = (Pill) mSPillSpinner.getSelectedItem();
+            List<PartOfDay> partsOfDay = mPartOfDayFragment.getPartsOfDay();
+            Calendar beginning = this.mBeginning;
+            Calendar end = this.mEnd;
             if (actualPill != null
                     && partsOfDay != null
                     && beginning != null
                     && end != null
                     && end.after(beginning)
                     && !partsOfDay.isEmpty())
-                treatmentToInsert = new Treatment(actualPill, partOfDayFragment.getPartsOfDay(), beginning, end);
+                treatmentToInsert = new Treatment(actualPill, mPartOfDayFragment.getPartsOfDay(), beginning, end);
         } catch (Exception e) {
             Log.i("Error ", Objects.requireNonNull(e.getMessage()));
         }
@@ -144,49 +143,49 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
 
     private void insertNewTreatment(Treatment currentTreatment) {
-       TreatmentBaseHelper treatmentBaseHelper = new TreatmentBaseHelper(this);
-        treatmentBaseHelper.insertTreatment(currentTreatment);
+       ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
+        projectBaseHelper.insertTreatment(currentTreatment);
     }
 
 
     private void initializeView() {
-        openDatePickerButtonBeginning = findViewById(R.id.B_DP_begin);
-        openDatePickerButtonEnd = findViewById(R.id.B_DP_end);
-        beginningDate = findViewById(R.id.TV_begin_date);
-        endDate = findViewById(R.id.TV_end_date);
-        recommended_duration = findViewById(R.id.TV_recommanded_duration);
+        mBOpenDatePickerButtonBeginning = findViewById(R.id.B_DP_begin);
+        mBOpenDatePickerButtonEnd = findViewById(R.id.B_DP_end);
+        mTVBeginningDate = findViewById(R.id.TV_begin_date);
+        mTVEndDate = findViewById(R.id.TV_end_date);
+        mTVRecommended_duration = findViewById(R.id.TV_recommanded_duration);
 
-        addPill = findViewById(R.id.B_add_pill);
-        modifyPill = findViewById(R.id.B_modify_pill);
-        treatmentValidation = findViewById(R.id.B_treatment_validate);
+        mFABAddPill = findViewById(R.id.B_add_pill);
+        mFABModifyPill = findViewById(R.id.B_modify_pill);
+        mBTreatmentValidation = findViewById(R.id.B_treatment_validate);
 
-        pillSpinner = findViewById(R.id.SP_pills_items);
+        mSPillSpinner = findViewById(R.id.SP_pills_items);
 
-        beginning = null;
-        end = null;
+        mBeginning = null;
+        mEnd = null;
     }
 
     private void initializePills() {
-        pillsBaseHelper = new PillsBaseHelper(this);
+        mProjectBaseHelper = new ProjectBaseHelper(this);
         List<Pill> pills = new ArrayList<>();
         try {
-            pills = pillsBaseHelper.getPills();
+            pills = mProjectBaseHelper.getPills();
         } catch (Exception e) {
             Log.i("Pills ! ", "problème : " + e.getMessage());
         }
 
         PillAdapter adapter = new PillAdapter(this, pills);
-        pillSpinner.setAdapter(adapter);
+        mSPillSpinner.setAdapter(adapter);
 
-        pillSpinner.setOnItemSelectedListener(this);
+        mSPillSpinner.setOnItemSelectedListener(this);
     }
 
     private void setActions() {
-        openDatePickerButtonBeginning.setOnClickListener(v -> showDatePickerDialog("beginning"));
-        openDatePickerButtonEnd.setOnClickListener(v -> showDatePickerDialog("end"));
-        addPill.setOnClickListener(v -> showPillScreen(null));
-        modifyPill.setOnClickListener(v -> showPillScreen(pillSpinner.getSelectedItem() != null ? (Pill) pillSpinner.getSelectedItem() : null));
-        treatmentValidation.setOnClickListener(v -> createNewTreatment());
+        mBOpenDatePickerButtonBeginning.setOnClickListener(v -> showDatePickerDialog("beginning"));
+        mBOpenDatePickerButtonEnd.setOnClickListener(v -> showDatePickerDialog("end"));
+        mFABAddPill.setOnClickListener(v -> showPillScreen(null));
+        mFABModifyPill.setOnClickListener(v -> showPillScreen(mSPillSpinner.getSelectedItem() != null ? (Pill) mSPillSpinner.getSelectedItem() : null));
+        mBTreatmentValidation.setOnClickListener(v -> createNewTreatment());
     }
 
 
@@ -208,32 +207,32 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
             public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
                 if (sender.equals("end")) {
                     try {
-                        if (beginning != null) {
+                        if (mBeginning != null) {
                             Calendar endCalendar = Calendar.getInstance();
                             endCalendar.set(selectedYear, selectedMonth, selectedDay);
-                            end = endCalendar;
+                            mEnd = endCalendar;
 
                             Calendar dt = Calendar.getInstance();
-                            dt.setTime(beginning.getTime());
-                            dt.add(Calendar.DATE, duration);
+                            dt.setTime(mBeginning.getTime());
+                            dt.add(Calendar.DATE, mDuration);
 
-                            if (end.before(beginning) || end.equals(beginning) || end.before(dt)) {
-                                end = null;
+                            if (mEnd.before(mBeginning) || mEnd.equals(mBeginning) || mEnd.before(dt)) {
+                                mEnd = null;
                                 throw new Exception("La date de fin ne peut pas être avant la date de début, et doit respecter la durée du traitement");
                             } else {
-                                endDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Ajoutez 1 à selectedMonth car il commence à 0.
+                                mTVEndDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Ajoutez 1 à selectedMonth car il commence à 0.
                             }
                         }
                     } catch (Exception e) {
-                        endDate.setText("Date error");
+                        mTVEndDate.setText("Date error");
                         Toast.makeText(getApplicationContext(), "La date de fin ne peut pas être avant la date de début", Toast.LENGTH_SHORT).show();
                     }
                 } else if (sender.equals("beginning")) {
                     Calendar beginningCalendar = Calendar.getInstance();
                     beginningCalendar.set(selectedYear, selectedMonth, selectedDay);
-                    beginning = beginningCalendar;
+                    mBeginning = beginningCalendar;
 
-                    beginningDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Ajoutez 1 à selectedMonth car il commence à 0.
+                    mTVBeginningDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Ajoutez 1 à selectedMonth car il commence à 0.
                 }
             }
         }, year, month, day);
@@ -243,11 +242,11 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
     private void putFragments() {
         FragmentManager fm = getSupportFragmentManager();
-        partOfDayFragment = (PartOfDay_fragment_controller) fm.findFragmentById(R.id.fragment_container_treatment);
-        if (partOfDayFragment == null) {
-            partOfDayFragment = new PartOfDay_fragment_controller();
+        mPartOfDayFragment = (PartOfDay_fragment_controller) fm.findFragmentById(R.id.fragment_container_treatment);
+        if (mPartOfDayFragment == null) {
+            mPartOfDayFragment = new PartOfDay_fragment_controller();
             fm.beginTransaction()
-                    .add(R.id.fragment_container_treatment, partOfDayFragment)
+                    .add(R.id.fragment_container_treatment, mPartOfDayFragment)
                     .commit();
         }
     }
@@ -255,11 +254,11 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
     @SuppressLint("SetTextI18n")
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        actualPill = (Pill) adapterView.getItemAtPosition(i);
-        recommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + actualPill.getDuration() + " jours");
-        duration = actualPill.getDuration();
-        if(treatmentToWorkOn == null)
-            partOfDayFragment.setCheckBoxState(actualPill);
+        mActualPill = (Pill) adapterView.getItemAtPosition(i);
+        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + " jours");
+        mDuration = mActualPill.getDuration();
+        if(mTreatmentToWorkOn == null)
+            mPartOfDayFragment.setCheckBoxState(mActualPill);
     }
 
     @Override
@@ -269,7 +268,7 @@ public class Treatment_screen_controller extends AppCompatActivity implements Ad
 
     @Override
     protected void onDestroy() {
-        pillsBaseHelper.close();
+        mProjectBaseHelper.close();
         super.onDestroy();
     }
 
