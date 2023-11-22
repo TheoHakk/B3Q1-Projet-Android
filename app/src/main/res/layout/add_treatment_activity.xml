@@ -11,7 +11,7 @@
         android:layout_height="54dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="16dp"
-        android:text="@string/add_treatment"
+        android:text="@string/addTreatment"
         android:textAlignment="viewStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textSize="22sp"
@@ -46,7 +46,7 @@
         app:layout_constraintStart_toEndOf="@+id/SP_pills_items"
         app:layout_constraintTop_toBottomOf="@+id/TV_pill"
         app:srcCompat="@android:drawable/ic_input_add"
-        android:contentDescription="@string/descr_fab_addPill"
+        android:contentDescription="@string/descrFABAddPill"
         android:focusable="true" />
 
     <Spinner
@@ -126,7 +126,7 @@
                 android:id="@+id/B_DP_end"
                 android:layout_width="35dp"
                 android:layout_height="41dp"
-                android:text="@string/calendar_emoji"
+                android:text="@string/calendarEmoji"
                 tools:ignore="MissingConstraints" />
         </LinearLayout>
 
@@ -168,14 +168,14 @@
                 android:id="@+id/B_DP_begin"
                 android:layout_width="35dp"
                 android:layout_height="41dp"
-                android:text="@string/calendar_emoji"
+                android:text="@string/calendarEmoji"
                 tools:ignore="MissingConstraints" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_treatment"
-        android:name="be.helha.hakem_android_project.controllers.PartOfDay_fragment_controller"
+        android:name="be.helha.hakem_android_project.controllers.fragments.PartOfDayFragmentController"
         android:layout_width="354dp"
         android:layout_height="159dp"
         android:layout_marginTop="16dp"
@@ -196,7 +196,7 @@
         app:layout_constraintTop_toBottomOf="@+id/TV_pill"
         app:srcCompat="@android:drawable/ic_menu_manage"
         android:focusable="true"
-        android:contentDescription="@string/descr_fab_modifyPill" />
+        android:contentDescription="@string/descrFABModifyPill" />
 
     <TextView
         android:id="@+id/TV_recommanded_duration"
@@ -204,7 +204,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="20dp"
-        android:text="@string/recommanded_duration"
+        android:text="@string/recommandedDuration"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/SP_pills_items" />
 
