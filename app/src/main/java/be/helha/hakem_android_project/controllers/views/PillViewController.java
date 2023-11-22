@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -51,6 +52,7 @@ public class PillViewController extends AppCompatActivity {
         setContentView(R.layout.add_pill_activity);
         init();
         verifyIntent();
+        initFragments();
     }
 
     /**
@@ -61,7 +63,6 @@ public class PillViewController extends AppCompatActivity {
             mPillToWorkOn = (Pill) getIntent().getSerializableExtra("pill");
         if (mPillToWorkOn != null)
             showPillInformation();
-        initFragments();
     }
 
     /**
@@ -90,29 +91,18 @@ public class PillViewController extends AppCompatActivity {
      * Adds the PartOfDayFragmentController to the fragment container.
      */
     private void initFragments() {
-        FragmentManager fm = getSupportFragmentManager();
-        mPartOfDayFragment = (PartOfDayFragmentController) fm.findFragmentById(R.id.fragment_container);
-        if (mPartOfDayFragment == null) {
-            if (mPillToWorkOn != null) {
-                mPartOfDayFragment = new PartOfDayFragmentController();
-                fm.beginTransaction()
-                        .add(
-                                R.id.fragment_container,
-                                PartOfDayFragmentController.class,
-                                getBundlePartsOfDay(mPillToWorkOn))
-                        .commit();
-
-            }
-        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        mPartOfDayFragment = new PartOfDayFragmentController();
+        if (mPillToWorkOn != null)
+            mPartOfDayFragment.setArguments(getBundlePill(mPillToWorkOn));
+        fragmentManager.beginTransaction().add(R.id.fragment_container, mPartOfDayFragment).commit();
     }
 
-    private Bundle getBundlePartsOfDay(Pill pill) {
+    private Bundle getBundlePill(Pill pill) {
         Bundle bundle = new Bundle();
-        List<PartOfDay> partsOfDay = pill.getPartsOfDay();
         Hashtable hashtable = new Hashtable();
-        String PARTS_OF_DAY_DIC = "PARTS_OF_DAY_DIC";
-        hashtable.put(PARTS_OF_DAY_DIC, partsOfDay);
-        bundle.putSerializable(PARTS_OF_DAY_DIC, hashtable);
+        hashtable.put("PARTS_OF_DAY_DIC", pill.getPartsOfDay());
+        bundle.putSerializable("PARTS_OF_DAY_DIC", hashtable);
         return bundle;
     }
 
@@ -141,30 +131,29 @@ public class PillViewController extends AppCompatActivity {
             updatePill();
         else
             createNewPill();
-        finish();
     }
 
     /**
      * Creates a new pill and inserts it into the database.
      */
     private void createNewPill() {
-        Pill pill = null;
+        Pill pill;
         try {
-            if (mETName.getText().toString().isEmpty() || mDuration == 0)
+            if (mETName.getText().toString().isEmpty() || mDuration == 0 || mPartOfDayFragment.getPartsOfDay().isEmpty())
                 throw new Exception("Name or duration is empty");
             pill = new Pill(mETName.getText().toString(), mDuration, mPartOfDayFragment.getPartsOfDay());
         } catch (Exception e) {
+            Toast.makeText(this, "Name or duration is empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
+        BankPill bankPill = new BankPill(projectBaseHelper.getWritableDatabase());
+        try {
+            bankPill.insertPill(pill);
+        } catch (Exception e) {
             Log.i("ERROR", "validatePill: " + e.getMessage());
         }
-        if (pill != null) {
-            ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
-            BankPill bankPill = new BankPill(projectBaseHelper.getWritableDatabase());
-            try {
-                bankPill.insertPill(pill);
-            } catch (Exception e) {
-                Log.i("ERROR", "validatePill: " + e.getMessage());
-            }
-        }
+        finish();
     }
 
     /**
@@ -174,13 +163,17 @@ public class PillViewController extends AppCompatActivity {
         ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
         BankPill bankPill = new BankPill(projectBaseHelper.getWritableDatabase());
         try {
+            if (mETName.getText().toString().isEmpty() || mDuration == 0 || mPartOfDayFragment.getPartsOfDay().isEmpty())
+                throw new Exception("Name or duration is empty, or checkboxes not checked");
             mPillToWorkOn.setName(mETName.getText().toString());
             mPillToWorkOn.setDuration(mDuration);
             mPillToWorkOn.setPartsOfDay(mPartOfDayFragment.getPartsOfDay());
             bankPill.updatePill(mPillToWorkOn);
         } catch (Exception e) {
-            Log.i("ERROR", "updatePill: " + e.getMessage());
+            Toast.makeText(this, "Name or duration is empty, or checkboxes not checked", Toast.LENGTH_SHORT).show();
+            return;
         }
+        finish();
     }
 
     /**

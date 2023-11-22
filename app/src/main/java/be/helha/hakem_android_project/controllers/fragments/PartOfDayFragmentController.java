@@ -26,8 +26,6 @@ public class PartOfDayFragmentController extends Fragment {
     private CheckBox mEvening;
 
 
-
-
     /**
      * Called to have the fragment instantiate its user interface view.
      *
@@ -46,12 +44,13 @@ public class PartOfDayFragmentController extends Fragment {
     }
 
     private void getArgs() {
-        if (getArguments() != null) {
-            Hashtable hashtable = (Hashtable) getArguments().getSerializable("PARTS_OF_DAY_DIC");
-            List<PartOfDay> partsOfDay = (List<PartOfDay>) hashtable.get("PARTS_OF_DAY_DIC");
-            for(PartOfDay partOfDay : partsOfDay)
-                Log.i("part : " , partOfDay.toString());
-            setCheckBoxState(partsOfDay);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            Hashtable hashtable = (Hashtable) bundle.getSerializable("PARTS_OF_DAY_DIC");
+            if (hashtable != null) {
+                List<PartOfDay> partsOfDay = (List<PartOfDay>) hashtable.get("PARTS_OF_DAY_DIC");
+                setCheckBoxState(partsOfDay);
+            }
         }
     }
 
@@ -67,7 +66,6 @@ public class PartOfDayFragmentController extends Fragment {
     public PartOfDayFragmentController() {
         super(R.layout.calendar_part_fragment);
     }
-
 
 
     /**
@@ -86,30 +84,31 @@ public class PartOfDayFragmentController extends Fragment {
         return partsOfDay;
     }
 
-
     /**
      * Sets the state of checkboxes based on the provided list of parts of the day.
      *
      * @param partsOfDay The list of parts of the day used to set the checkbox state.
      */
     public void setCheckBoxState(List<PartOfDay> partsOfDay) {
-
+        // Uncheck all checkboxes by default
         mMorning.setChecked(false);
         mNoon.setChecked(false);
         mEvening.setChecked(false);
 
-        for (PartOfDay partOfDay : partsOfDay) {
-            switch (partOfDay) {
-                case MORNING:
-                    mMorning.setChecked(true);
-                    break;
-                case NOON:
-                    mNoon.setChecked(true);
-                    break;
-                case EVENING:
-                    mEvening.setChecked(true);
-                    break;
-            }
-        }
+        if (partsOfDay != null && !partsOfDay.isEmpty())
+            // If partsOfDay is not null and not empty, set checkbox state based on the provided list
+            for (PartOfDay partOfDay : partsOfDay)
+                switch (partOfDay) {
+                    case MORNING:
+                        mMorning.setChecked(true);
+                        break;
+                    case NOON:
+                        mNoon.setChecked(true);
+                        break;
+                    case EVENING:
+                        mEvening.setChecked(true);
+                        break;
+                }
+
     }
 }
