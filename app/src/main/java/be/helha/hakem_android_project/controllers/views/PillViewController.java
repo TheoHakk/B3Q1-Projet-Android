@@ -1,4 +1,4 @@
-package be.helha.hakem_android_project.controllers;
+package be.helha.hakem_android_project.controllers.views;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -9,24 +9,33 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
-
 import be.helha.hakem_android_project.R;
+import be.helha.hakem_android_project.controllers.fragments.PartOfDayFragmentController;
 import be.helha.hakem_android_project.db.BankPill;
 import be.helha.hakem_android_project.db.ProjectBaseHelper;
 import be.helha.hakem_android_project.models.Pill;
 
-public class Pill_view_controller extends AppCompatActivity {
+/**
+ * The PillViewController class represents the controller for managing the view to add or edit a pill.
+ */
+public class PillViewController extends AppCompatActivity {
 
     private Button mBUpDays;
     private Button mBDownDays;
     private Button mBValidate;
     private TextView mTVDuration;
     private EditText mETName;
-    private PartOfDay_fragment_controller mPartOfDayFragment;
+    private PartOfDayFragmentController mPartOfDayFragment;
     private Pill mPillToWorkOn;
     private int mDuration;
 
-
+    /**
+     * Called when the activity is starting.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           then this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     *                           Note: Otherwise, it is null.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,19 +45,25 @@ public class Pill_view_controller extends AppCompatActivity {
         verifyIntent();
     }
 
+    /**
+     * Verifies the intent for any extras, and shows pill information if available.
+     */
     private void verifyIntent() {
         if (getIntent().getExtras() != null)
             mPillToWorkOn = (Pill) getIntent().getSerializableExtra("pill");
         if (mPillToWorkOn != null)
-            showPillInformations();
+            showPillInformation();
     }
 
-    private void showPillInformations() {
+    /**
+     * Shows information for the existing pill.
+     */
+    private void showPillInformation() {
         mETName.setText(mPillToWorkOn.getName());
         mDuration = mPillToWorkOn.getDuration();
         mTVDuration.setText(String.valueOf(mPillToWorkOn.getDuration()));
 
-        //Because of the fragment commit, we need to wait the fragment has instantiate its views
+        //Because of the fragment commit, we need to wait for the fragment to instantiate its views
         Thread thread = new Thread(() -> {
             while (mPartOfDayFragment.checkBoxState()) {
                 try {
@@ -62,6 +77,9 @@ public class Pill_view_controller extends AppCompatActivity {
         thread.start();
     }
 
+    /**
+     * Initializes the UI components.
+     */
     private void init() {
         mTVDuration = findViewById(R.id.TV_duration);
         mDuration = 0;
@@ -72,17 +90,23 @@ public class Pill_view_controller extends AppCompatActivity {
         setActions();
     }
 
+    /**
+     * Adds the PartOfDayFragmentController to the fragment container.
+     */
     private void putFragments() {
         FragmentManager fm = getSupportFragmentManager();
-        mPartOfDayFragment = (PartOfDay_fragment_controller) fm.findFragmentById(R.id.fragment_container);
+        mPartOfDayFragment = (PartOfDayFragmentController) fm.findFragmentById(R.id.fragment_container);
         if (mPartOfDayFragment == null) {
-            mPartOfDayFragment = new PartOfDay_fragment_controller();
+            mPartOfDayFragment = new PartOfDayFragmentController();
             fm.beginTransaction()
                     .add(R.id.fragment_container, mPartOfDayFragment)
                     .commit();
         }
     }
 
+    /**
+     * Sets the actions for the UI components.
+     */
     private void setActions() {
         mBUpDays.setOnClickListener(v -> {
             if (mDuration < 30)
@@ -97,6 +121,9 @@ public class Pill_view_controller extends AppCompatActivity {
         mBValidate.setOnClickListener(v -> validatePill());
     }
 
+    /**
+     * Validates the pill, either by creating a new one or updating the existing one.
+     */
     private void validatePill() {
         if (mPillToWorkOn != null)
             updatePill();
@@ -105,6 +132,9 @@ public class Pill_view_controller extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Creates a new pill and inserts it into the database.
+     */
     private void createNewPill() {
         Pill pill = null;
         try {
@@ -123,9 +153,11 @@ public class Pill_view_controller extends AppCompatActivity {
                 Log.i("ERROR", "validatePill: " + e.getMessage());
             }
         }
-
     }
 
+    /**
+     * Updates the existing pill in the database.
+     */
     private void updatePill() {
         ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
         BankPill bankPill = new BankPill(projectBaseHelper.getWritableDatabase());
@@ -139,7 +171,9 @@ public class Pill_view_controller extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Called when the activity is being destroyed.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

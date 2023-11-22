@@ -1,4 +1,8 @@
-package be.helha.hakem_android_project.controllers;
+/**
+ * The `TreatmentViewController` class represents the controller for managing the treatment view in the Android app.
+ * It extends `AppCompatActivity` and implements `AdapterView.OnItemSelectedListener`.
+ */
+package be.helha.hakem_android_project.controllers.views;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -10,21 +14,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
-
 import be.helha.hakem_android_project.R;
+import be.helha.hakem_android_project.controllers.adapters.PillAdapter;
+import be.helha.hakem_android_project.controllers.fragments.PartOfDayFragmentController;
 import be.helha.hakem_android_project.db.BankTreatment;
 import be.helha.hakem_android_project.db.DBSchema;
 import be.helha.hakem_android_project.db.PillsCursorWrapper;
@@ -33,7 +34,7 @@ import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
 import be.helha.hakem_android_project.models.Treatment;
 
-public class Treatment_view_controller extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class TreatmentViewController extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Button mBOpenDatePickerButtonBeginning;
     private Button mBOpenDatePickerButtonEnd;
     private Button mBTreatmentValidation;
@@ -43,26 +44,40 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
     private TextView mTVEndDate;
     private TextView mTVRecommended_duration;
     private Spinner mSPillSpinner;
-    private PartOfDay_fragment_controller mPartOfDayFragment;
+    private PartOfDayFragmentController mPartOfDayFragment;
     private ProjectBaseHelper mProjectBaseHelper;
     private Pill mActualPill;
     private Calendar mBeginning;
     private Calendar mEnd;
     private Treatment mTreatmentToWorkOn;
 
+    /**
+     * Called when the activity is starting. This is where most initialization should go.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being
+     *                           shut down, this Bundle contains the data it most recently supplied
+     *                           in onSaveInstanceState(Bundle). Otherwise, it is null.
+     */
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_treatment_activity);
         init();
     }
 
+    /**
+     * Called after the activity has been paused, typically before onResume().
+     * Update the view when we come back to the screen.
+     */
     @Override
     protected void onResume() {
-        //Update the view when we come back to the screen
         super.onResume();
         init();
     }
 
+    /**
+     * Initializes the view, pills, actions, fragments, and verifies the intent.
+     */
     private void init() {
         initializeView();
         initializePills();
@@ -71,6 +86,9 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
         verifyIntent();
     }
 
+    /**
+     * Verifies the intent for an existing treatment and displays its information.
+     */
     private void verifyIntent() {
         if (getIntent().getExtras() != null)
             mTreatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
@@ -78,6 +96,9 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
             showTreatmentInformations();
     }
 
+    /**
+     * Displays the information of an existing treatment.
+     */
     @SuppressLint("SetTextI18n")
     private void showTreatmentInformations() {
         mBeginning = mTreatmentToWorkOn.getBeginning();
@@ -85,14 +106,18 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
         mActualPill = mTreatmentToWorkOn.getPill();
         mTVBeginningDate.setText(mBeginning.get(Calendar.DAY_OF_MONTH) + "/" + (mBeginning.get(Calendar.MONTH) + 1) + "/" + mBeginning.get(Calendar.YEAR));
         mTVEndDate.setText(mEnd.get(Calendar.DAY_OF_MONTH) + "/" + (mEnd.get(Calendar.MONTH) + 1) + "/" + mEnd.get(Calendar.YEAR));
-        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + "@string/days");
+        mTVRecommended_duration.setText(getResources().getString(R.string.recommandedDuration) + " " + mActualPill.getDuration() + " @string/days");
 
         mSPillSpinner.setSelection(mActualPill.getId() - 1);
+
         launchThreadForBoxChecking();
     }
 
+    /**
+     * Launches a thread to check the state of checkboxes after fragment instantiation.
+     */
     private void launchThreadForBoxChecking() {
-        //Because of the fragment commit, we need to wait the fragment has instantiate its views
+        // Because of the fragment commit, we need to wait until the fragment has instantiated its views
         Thread thread = new Thread(() -> {
             while (mPartOfDayFragment.checkBoxState()) {
                 try {
@@ -106,6 +131,9 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
         thread.start();
     }
 
+    /**
+     * Creates a new treatment or updates an existing one.
+     */
     private void createNewTreatment() {
         Treatment treatmentToInsert = getCurrentTreatment();
         if (treatmentToInsert != null) {
@@ -118,6 +146,11 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
             Toast.makeText(getApplicationContext(), getResources().getString(R.string.noEmptyField), Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Updates the details of an existing treatment.
+     *
+     * @param actualTreatmentSettings The updated treatment settings.
+     */
     private void updateTreatment(Treatment actualTreatmentSettings) {
         ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
         BankTreatment bankTreatment = new BankTreatment(projectBaseHelper.getWritableDatabase());
@@ -130,6 +163,11 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
         bankTreatment.updateTreatment(mTreatmentToWorkOn);
     }
 
+    /**
+     * Gets the current treatment details from the view.
+     *
+     * @return The current treatment, or null if any field is empty or invalid.
+     */
     private Treatment getCurrentTreatment() {
         Treatment treatmentToInsert = null;
         try {
@@ -143,21 +181,27 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
                     && end != null
                     && end.after(beginning)
                     && !partsOfDay.isEmpty())
-                treatmentToInsert = new Treatment(actualPill, mPartOfDayFragment.getPartsOfDay(), beginning, end);
+                treatmentToInsert = new Treatment(actualPill, partsOfDay, beginning, end);
         } catch (Exception e) {
             Log.i("Error ", Objects.requireNonNull(e.getMessage()));
         }
         return treatmentToInsert;
     }
 
-
+    /**
+     * Inserts a new treatment into the database.
+     *
+     * @param currentTreatment The treatment to be inserted.
+     */
     private void insertNewTreatment(Treatment currentTreatment) {
         ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
         BankTreatment bankTreatment = new BankTreatment(projectBaseHelper.getWritableDatabase());
         bankTreatment.insertTreatment(currentTreatment);
     }
 
-
+    /**
+     * Initializes the views in the layout.
+     */
     private void initializeView() {
         mBOpenDatePickerButtonBeginning = findViewById(R.id.B_DP_begin);
         mBOpenDatePickerButtonEnd = findViewById(R.id.B_DP_end);
@@ -175,6 +219,9 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
         mEnd = null;
     }
 
+    /**
+     * Initializes the pills by retrieving them from the database.
+     */
     private void initializePills() {
         mProjectBaseHelper = new ProjectBaseHelper(this);
 
@@ -190,6 +237,9 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
         mSPillSpinner.setOnItemSelectedListener(this);
     }
 
+    /**
+     * Sets actions (event listeners) for various buttons and views in the layout.
+     */
     private void setActions() {
         mBOpenDatePickerButtonBeginning.setOnClickListener(v -> showDatePickerDialog("beginning"));
         mBOpenDatePickerButtonEnd.setOnClickListener(v -> showDatePickerDialog("end"));
@@ -198,13 +248,22 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
         mBTreatmentValidation.setOnClickListener(v -> createNewTreatment());
     }
 
-
+    /**
+     * Shows the pill screen activity, allowing the user to add or modify a pill.
+     *
+     * @param pill The pill to be modified, or null if adding a new pill.
+     */
     private void showPillScreen(Pill pill) {
-        Intent intent = new Intent(this, Pill_view_controller.class);
+        Intent intent = new Intent(this, PillViewController.class);
         intent.putExtra("pill", pill);
         startActivity(intent);
     }
 
+    /**
+     * Shows the date picker dialog for selecting the beginning or end date.
+     *
+     * @param sender A string indicating whether the date picker is for the beginning or end date.
+     */
     private void showDatePickerDialog(String sender) {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -233,42 +292,60 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
                 beginningCalendar.set(selectedYear, selectedMonth, selectedDay);
                 mBeginning = beginningCalendar;
 
-                mTVBeginningDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Ajoutez 1 à selectedMonth car il commence à 0.
+                mTVBeginningDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Add 1 to selectedMonth because it starts at 0.
             }
         }, year, month, day);
         datePickerDialog.show();
     }
 
-
+    /**
+     * Puts the fragment for handling parts of the day into the layout.
+     */
     private void putFragments() {
         FragmentManager fm = getSupportFragmentManager();
-        mPartOfDayFragment = (PartOfDay_fragment_controller) fm.findFragmentById(R.id.fragment_container_treatment);
+        mPartOfDayFragment = (PartOfDayFragmentController) fm.findFragmentById(R.id.fragment_container_treatment);
         if (mPartOfDayFragment == null) {
-            mPartOfDayFragment = new PartOfDay_fragment_controller();
+            mPartOfDayFragment = new PartOfDayFragmentController();
             fm.beginTransaction()
                     .add(R.id.fragment_container_treatment, mPartOfDayFragment)
                     .commit();
         }
     }
 
+    /**
+     * Called when an item in the spinner is selected.
+     *
+     * @param adapterView The AdapterView where the selection happened.
+     * @param view        The view within the AdapterView that was clicked.
+     * @param i           The position of the view in the adapter.
+     * @param l           The row id of the item that is selected.
+     */
     @SuppressLint("SetTextI18n")
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         mActualPill = (Pill) adapterView.getItemAtPosition(i);
-        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + getResources().getString(R.string.days).toLowerCase());
+        mTVRecommended_duration.setText(getResources().getString(R.string.recommandedDuration) + " " + mActualPill.getDuration() + getResources().getString(R.string.days).toLowerCase());
         if (mTreatmentToWorkOn == null)
             mPartOfDayFragment.setCheckBoxState(mActualPill);
     }
 
+    /**
+     * Called when nothing is selected in the spinner.
+     *
+     * @param adapterView The AdapterView where nothing is selected.
+     */
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-        //Nothing to do
+        // Nothing to do
     }
 
+    /**
+     * Called when the activity is about to be destroyed.
+     * Closes the database helper to prevent memory leaks.
+     */
     @Override
     protected void onDestroy() {
         mProjectBaseHelper.close();
         super.onDestroy();
     }
-
 }
