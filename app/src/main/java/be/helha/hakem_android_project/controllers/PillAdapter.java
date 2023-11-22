@@ -1,4 +1,4 @@
-package be.helha.hakem_android_project.views;
+package be.helha.hakem_android_project.controllers;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import java.util.List;
 
@@ -16,8 +18,9 @@ public class PillAdapter extends ArrayAdapter<Pill> {
         super(context, 0, pills);
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         /*
             This method is called to display an element
             in the Spinner when the latter is closed.
@@ -38,7 +41,7 @@ public class PillAdapter extends ArrayAdapter<Pill> {
     }
 
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
         /*
             This method is called to display the elements in
             the drop-down list when the user scrolls the Spinner

@@ -1,47 +1,58 @@
 package be.helha.hakem_android_project.db;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import be.helha.hakem_android_project.models.PartOfDay;
-import be.helha.hakem_android_project.models.Pill;
-import be.helha.hakem_android_project.models.Treatment;
-
+/**
+ * The ProjectBaseHelper class is a helper class for managing the creation and upgrading
+ * of the SQLite database used in the project.
+ */
 public class ProjectBaseHelper extends SQLiteOpenHelper {
-    private static final int VERSION = 1; // version de la base de donnée, va servir à savoir s'il faut mettre à jour le code
+
+    private static final int VERSION = 1; // version of the database, used for potential updates
     private static final String DATABASE_NAME = "db_onlypills.db";
 
+    /**
+     * Constructs a new instance of the ProjectBaseHelper class.
+     *
+     * @param context The context in which the helper is created.
+     */
     public ProjectBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
+
+    /**
+     * Called when the database needs to be created.
+     *
+     * @param sqLiteDatabase The SQLiteDatabase instance.
+     */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        //Method called when we need to CREATE the db file
-        //So, note for a dumb guy like me : method is called when the file doesn't exist
         sqLiteDatabase.execSQL(createTablePillsString());
         sqLiteDatabase.execSQL(createTableTreatmentString());
     }
+
+    /**
+     * Called when the database needs to be upgraded.
+     *
+     * @param sqLiteDatabase The SQLiteDatabase instance.
+     * @param oldVersion     The old version of the database.
+     * @param newVersion     The new version of the database.
+     */
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        //We will do here the update of the database
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        // Perform database upgrade if necessary
+        // This method is called when the version number is increased
     }
 
-
+    /**
+     * Creates the SQL string for creating the Treatments table.
+     *
+     * @return The SQL string for creating the Treatments table.
+     */
     private String createTableTreatmentString() {
-        return "Create Table if not exists " +
+        return "CREATE TABLE IF NOT EXISTS " +
                 DBSchema.TreatmentsTable.NAME + "(" +
                 DBSchema.TreatmentsTable.Cols.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 DBSchema.TreatmentsTable.Cols.PILLID + " INTEGER NOT NULL, " +
@@ -51,8 +62,14 @@ public class ProjectBaseHelper extends SQLiteOpenHelper {
                 DBSchema.TreatmentsTable.Cols.NOON + " INTEGER NOT NULL, " +
                 DBSchema.TreatmentsTable.Cols.EVENING + " INTEGER NOT NULL )";
     }
+
+    /**
+     * Creates the SQL string for creating the Pills table.
+     *
+     * @return The SQL string for creating the Pills table.
+     */
     private String createTablePillsString() {
-        return "Create Table if not exists " +
+        return "CREATE TABLE IF NOT EXISTS " +
                 DBSchema.PillsTable.NAME + "(" +
                 DBSchema.PillsTable.Cols.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 DBSchema.PillsTable.Cols.NAME + " TEXT NOT NULL, " +
@@ -61,9 +78,4 @@ public class ProjectBaseHelper extends SQLiteOpenHelper {
                 DBSchema.PillsTable.Cols.NOON + " INTEGER NOT NULL, " +
                 DBSchema.PillsTable.Cols.EVENING + " INTEGER NOT NULL )";
     }
-
-
-
-
 }
-

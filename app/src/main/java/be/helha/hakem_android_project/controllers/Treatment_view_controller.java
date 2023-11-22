@@ -1,4 +1,4 @@
-package be.helha.hakem_android_project.views;
+package be.helha.hakem_android_project.controllers;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -20,7 +20,6 @@ import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +29,6 @@ import be.helha.hakem_android_project.db.BankTreatment;
 import be.helha.hakem_android_project.db.DBSchema;
 import be.helha.hakem_android_project.db.PillsCursorWrapper;
 import be.helha.hakem_android_project.db.ProjectBaseHelper;
-import be.helha.hakem_android_project.db.TreatmentsCursorWrapper;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
 import be.helha.hakem_android_project.models.Treatment;
@@ -48,7 +46,6 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
     private PartOfDay_fragment_controller mPartOfDayFragment;
     private ProjectBaseHelper mProjectBaseHelper;
     private Pill mActualPill;
-    private int mDuration;
     private Calendar mBeginning;
     private Calendar mEnd;
     private Treatment mTreatmentToWorkOn;
@@ -81,14 +78,14 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
             showTreatmentInformations();
     }
 
+    @SuppressLint("SetTextI18n")
     private void showTreatmentInformations() {
         mBeginning = mTreatmentToWorkOn.getBeginning();
         mEnd = mTreatmentToWorkOn.getEnd();
         mActualPill = mTreatmentToWorkOn.getPill();
-        mDuration = mActualPill.getDuration();
         mTVBeginningDate.setText(mBeginning.get(Calendar.DAY_OF_MONTH) + "/" + (mBeginning.get(Calendar.MONTH) + 1) + "/" + mBeginning.get(Calendar.YEAR));
         mTVEndDate.setText(mEnd.get(Calendar.DAY_OF_MONTH) + "/" + (mEnd.get(Calendar.MONTH) + 1) + "/" + mEnd.get(Calendar.YEAR));
-        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + " jours");
+        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + "@string/days");
 
         mSPillSpinner.setSelection(mActualPill.getId() - 1);
         launchThreadForBoxChecking();
@@ -213,34 +210,30 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
-                if (sender.equals("end")) {
-                    try {
-                        if (mBeginning != null) {
-                            Calendar endCalendar = Calendar.getInstance();
-                            endCalendar.set(selectedYear, selectedMonth, selectedDay);
-                            mEnd = endCalendar;
+        @SuppressLint("SetTextI18n") DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDay) -> {
+            if (sender.equals("end")) {
+                try {
+                    if (mBeginning != null) {
+                        Calendar endCalendar = Calendar.getInstance();
+                        endCalendar.set(selectedYear, selectedMonth, selectedDay);
+                        mEnd = endCalendar;
 
-                            if (mEnd.before(mBeginning) || mEnd.equals(mBeginning)) {
-                                mEnd = null;
-                                throw new Exception(getResources().getString(R.string.errorBeginDateAfterEnd));
-                            } else
-                                mTVEndDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // add 1 to selectedMonth because it starts at 0.
-                        }
-                    } catch (Exception e) {
-                        mTVEndDate.setText(getResources().getString(R.string.dateError));
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.errorBeginDateAfterEnd), Toast.LENGTH_SHORT).show();
+                        if (mEnd.before(mBeginning) || mEnd.equals(mBeginning)) {
+                            mEnd = null;
+                            throw new Exception(getResources().getString(R.string.errorBeginDateAfterEnd));
+                        } else
+                            mTVEndDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // add 1 to selectedMonth because it starts at 0.
                     }
-                } else if (sender.equals("beginning")) {
-                    Calendar beginningCalendar = Calendar.getInstance();
-                    beginningCalendar.set(selectedYear, selectedMonth, selectedDay);
-                    mBeginning = beginningCalendar;
-
-                    mTVBeginningDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Ajoutez 1 à selectedMonth car il commence à 0.
+                } catch (Exception e) {
+                    mTVEndDate.setText(getResources().getString(R.string.dateError));
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.errorBeginDateAfterEnd), Toast.LENGTH_SHORT).show();
                 }
+            } else if (sender.equals("beginning")) {
+                Calendar beginningCalendar = Calendar.getInstance();
+                beginningCalendar.set(selectedYear, selectedMonth, selectedDay);
+                mBeginning = beginningCalendar;
+
+                mTVBeginningDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Ajoutez 1 à selectedMonth car il commence à 0.
             }
         }, year, month, day);
         datePickerDialog.show();
@@ -262,8 +255,7 @@ public class Treatment_view_controller extends AppCompatActivity implements Adap
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         mActualPill = (Pill) adapterView.getItemAtPosition(i);
-        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + getResources().getString(R.string.days));
-        mDuration = mActualPill.getDuration();
+        mTVRecommended_duration.setText(getResources().getString(R.string.recommanded_duration) + " " + mActualPill.getDuration() + getResources().getString(R.string.days).toLowerCase());
         if (mTreatmentToWorkOn == null)
             mPartOfDayFragment.setCheckBoxState(mActualPill);
     }

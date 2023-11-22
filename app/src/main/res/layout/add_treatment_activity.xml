@@ -9,7 +9,7 @@
         android:id="@+id/TV_title_treatment"
         android:layout_width="339dp"
         android:layout_height="54dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="16dp"
         android:text="@string/add_treatment"
         android:textAlignment="viewStart"
@@ -45,7 +45,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/SP_pills_items"
         app:layout_constraintTop_toBottomOf="@+id/TV_pill"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:srcCompat="@android:drawable/ic_input_add"
+        android:contentDescription="@string/descr_fab_addPill"
+        android:focusable="true" />
 
     <Spinner
         android:id="@+id/SP_pills_items"
@@ -61,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Dates"
+        android:text="@string/dates"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -96,7 +98,8 @@
             android:layout_marginEnd="40dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2">
+            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            tools:ignore="NotSibling">
 
             <LinearLayout
                 android:layout_width="99dp"
@@ -135,10 +138,11 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toStartOf="@+id/linearLayout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2">
+            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            tools:ignore="NotSibling">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
@@ -148,36 +152,38 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Début"
-                    android:textSize="16sp" />
+                    android:text="@string/beginning"
+                    android:textSize="16sp"
+                    tools:ignore="NestedWeights" />
 
                 <TextView
                     android:id="@+id/TV_begin_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Date" />
+                    android:text="@string/date" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/B_DP_begin"
                 android:layout_width="35dp"
                 android:layout_height="41dp"
-                android:text="📅"
+                android:text="@string/calendar_emoji"
                 tools:ignore="MissingConstraints" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_treatment"
-        android:name="be.helha.hakem_android_project.views.PartOfDay_fragment_controller"
+        android:name="be.helha.hakem_android_project.controllers.PartOfDay_fragment_controller"
         android:layout_width="354dp"
         android:layout_height="159dp"
         android:layout_marginTop="16dp"
         app:layout_constraintBottom_toTopOf="@+id/B_treatment_validate"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintVertical_bias="0.034"
-        tools:layout_editor_absoluteX="19dp" />
+        tools:layout_editor_absoluteX="19dp"
+        tools:ignore="MissingConstraints" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/B_modify_pill"
@@ -188,7 +194,9 @@
         android:clickable="true"
         app:layout_constraintStart_toEndOf="@+id/B_add_pill"
         app:layout_constraintTop_toBottomOf="@+id/TV_pill"
-        app:srcCompat="@android:drawable/ic_menu_manage" />
+        app:srcCompat="@android:drawable/ic_menu_manage"
+        android:focusable="true"
+        android:contentDescription="@string/descr_fab_modifyPill" />
 
     <TextView
         android:id="@+id/TV_recommanded_duration"

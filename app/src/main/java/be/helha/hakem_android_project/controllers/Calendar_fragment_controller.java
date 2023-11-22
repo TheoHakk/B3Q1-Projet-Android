@@ -1,4 +1,4 @@
-package be.helha.hakem_android_project.views;
+package be.helha.hakem_android_project.controllers;
 
 import android.content.Intent;
 import android.os.Bundle;

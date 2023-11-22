@@ -1,4 +1,4 @@
-package be.helha.hakem_android_project.views;
+package be.helha.hakem_android_project.controllers;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -117,13 +117,11 @@ public class Calendar_view_controller extends AppCompatActivity {
     }
 
     private void setActions() {
-        mFABAddTreatment.setOnClickListener(v -> showTreatmentScreen(null));
+        mFABAddTreatment.setOnClickListener(v -> showTreatmentScreen());
     }
 
-    private void showTreatmentScreen(Treatment treatment) {
+    private void showTreatmentScreen() {
         Intent intent = new Intent(this, Treatment_view_controller.class);
-        if (treatment != null)
-            intent.putExtra("treatment", treatment);
         startActivity(intent);
     }
 

@@ -1,4 +1,4 @@
-package be.helha.hakem_android_project.views;
+package be.helha.hakem_android_project.controllers;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +20,7 @@ public class Pill_view_controller extends AppCompatActivity {
     private Button mBUpDays;
     private Button mBDownDays;
     private Button mBValidate;
-    private  TextView mTVDuration;
+    private TextView mTVDuration;
     private EditText mETName;
     private PartOfDay_fragment_controller mPartOfDayFragment;
     private Pill mPillToWorkOn;

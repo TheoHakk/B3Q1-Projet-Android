@@ -13,12 +13,16 @@
         android:theme="@style/Theme.HakemAndroidProject"
         tools:targetApi="31">
 
-        <activity android:name=".views.Treatment_view_controller" android:exported="true"></activity>
-        <activity android:name=".views.Pill_view_controller" android:exported="true"></activity>
+        <activity
+            android:name=".controllers.Treatment_view_controller"
+            android:exported="true" />
+        <activity
+            android:name=".controllers.Pill_view_controller"
+            android:exported="true" />
 
 
         <activity
-            android:name=".views.Calendar_view_controller"
+            android:name=".controllers.Calendar_view_controller"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

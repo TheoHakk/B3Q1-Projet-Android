@@ -15,7 +15,12 @@ public class Pill implements Serializable {
         this.mDuration = mDuration;
         this.mPartsOfDay = partOfDays;
     }
-
+    public Pill(String mName, int mDuration, List<PartOfDay> partOfDays, int id) {
+        this.mName = mName;
+        this.mDuration = mDuration;
+        this.mPartsOfDay = partOfDays;
+        this.mId = id;
+    }
 
     public String getName() {
         return mName;
@@ -45,15 +50,4 @@ public class Pill implements Serializable {
         return mId;
     }
 
-    public int setId(int id) {
-        return this.mId = id;
-    }
-
-
-    public String getStringPartsOfDay() {
-        String partsOfDay = "";
-        for (PartOfDay partOfDay : this.mPartsOfDay)
-            partsOfDay += partOfDay.toString() + " ";
-        return partsOfDay;
-    }
 }
