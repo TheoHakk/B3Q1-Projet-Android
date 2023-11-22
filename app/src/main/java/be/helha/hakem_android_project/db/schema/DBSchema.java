@@ -1,4 +1,4 @@
-package be.helha.hakem_android_project.db;
+package be.helha.hakem_android_project.db.schema;
 
 /**
  * The DBSchema class defines the database schema including table names and column names

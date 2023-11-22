@@ -1,7 +1,8 @@
-package be.helha.hakem_android_project.db;
+package be.helha.hakem_android_project.db.bank;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import be.helha.hakem_android_project.db.schema.DBSchema;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Treatment;
 

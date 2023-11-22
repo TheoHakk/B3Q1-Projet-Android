@@ -1,8 +1,10 @@
-package be.helha.hakem_android_project.db;
+package be.helha.hakem_android_project.db.baseHelper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import be.helha.hakem_android_project.db.schema.DBSchema;
 
 /**
  * The ProjectBaseHelper class is a helper class for managing the creation and upgrading

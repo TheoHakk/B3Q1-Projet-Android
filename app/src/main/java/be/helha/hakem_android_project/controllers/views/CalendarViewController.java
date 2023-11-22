@@ -20,9 +20,9 @@ import java.util.List;
 
 import be.helha.hakem_android_project.R;
 import be.helha.hakem_android_project.controllers.fragments.CalendarFragmentController;
-import be.helha.hakem_android_project.db.DBSchema;
-import be.helha.hakem_android_project.db.ProjectBaseHelper;
-import be.helha.hakem_android_project.db.TreatmentsCursorWrapper;
+import be.helha.hakem_android_project.db.schema.DBSchema;
+import be.helha.hakem_android_project.db.baseHelper.ProjectBaseHelper;
+import be.helha.hakem_android_project.db.cursorWrapper.TreatmentsCursorWrapper;
 import be.helha.hakem_android_project.models.DayOfTreatment;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Treatment;

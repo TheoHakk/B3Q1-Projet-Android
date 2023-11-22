@@ -17,19 +17,24 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
+
 import be.helha.hakem_android_project.R;
 import be.helha.hakem_android_project.controllers.adapters.PillAdapter;
 import be.helha.hakem_android_project.controllers.fragments.PartOfDayFragmentController;
-import be.helha.hakem_android_project.db.BankTreatment;
-import be.helha.hakem_android_project.db.DBSchema;
-import be.helha.hakem_android_project.db.PillsCursorWrapper;
-import be.helha.hakem_android_project.db.ProjectBaseHelper;
+import be.helha.hakem_android_project.db.bank.BankTreatment;
+import be.helha.hakem_android_project.db.schema.DBSchema;
+import be.helha.hakem_android_project.db.cursorWrapper.PillsCursorWrapper;
+import be.helha.hakem_android_project.db.baseHelper.ProjectBaseHelper;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
 import be.helha.hakem_android_project.models.Treatment;
@@ -50,6 +55,7 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
     private Calendar mBeginning;
     private Calendar mEnd;
     private Treatment mTreatmentToWorkOn;
+
 
     /**
      * Called when the activity is starting. This is where most initialization should go.
@@ -79,11 +85,10 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
      * Initializes the view, pills, actions, fragments, and verifies the intent.
      */
     private void init() {
+        verifyIntent();
         initializeView();
         initializePills();
         setActions();
-        putFragments();
-        verifyIntent();
     }
 
     /**
@@ -92,8 +97,10 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
     private void verifyIntent() {
         if (getIntent().getExtras() != null)
             mTreatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
-        if (mTreatmentToWorkOn != null)
+        if (mTreatmentToWorkOn != null) {
+            initFragments();
             showTreatmentInformations();
+        }
     }
 
     /**
@@ -107,29 +114,38 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
         mTVBeginningDate.setText(mBeginning.get(Calendar.DAY_OF_MONTH) + "/" + (mBeginning.get(Calendar.MONTH) + 1) + "/" + mBeginning.get(Calendar.YEAR));
         mTVEndDate.setText(mEnd.get(Calendar.DAY_OF_MONTH) + "/" + (mEnd.get(Calendar.MONTH) + 1) + "/" + mEnd.get(Calendar.YEAR));
         mTVRecommended_duration.setText(getResources().getString(R.string.recommandedDuration) + " " + mActualPill.getDuration() + " @string/days");
-
         mSPillSpinner.setSelection(mActualPill.getId() - 1);
-
-        launchThreadForBoxChecking();
     }
 
     /**
-     * Launches a thread to check the state of checkboxes after fragment instantiation.
+     * Puts the fragment for handling parts of the day into the layout.
      */
-    private void launchThreadForBoxChecking() {
-        // Because of the fragment commit, we need to wait until the fragment has instantiated its views
-        Thread thread = new Thread(() -> {
-            while (mPartOfDayFragment.checkBoxState()) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    private void initFragments() {
+        FragmentManager fm = getSupportFragmentManager();
+        mPartOfDayFragment = (PartOfDayFragmentController) fm.findFragmentById(R.id.fragment_container);
+        if (mPartOfDayFragment == null) {
+            if (mTreatmentToWorkOn.getPill() != null) {
+                mPartOfDayFragment = new PartOfDayFragmentController();
+                fm.beginTransaction()
+                        .add(
+                                R.id.fragment_container,
+                                PartOfDayFragmentController.class,
+                                getBundlePartsOfDay(mTreatmentToWorkOn.getPill()))
+                        .commit();
             }
-            mPartOfDayFragment.setCheckBoxState(mTreatmentToWorkOn.getPartsOfDay());
-        });
-        thread.start();
+        }
     }
+
+    private Bundle getBundlePartsOfDay(Pill pill) {
+        Bundle bundle = new Bundle();
+        List<PartOfDay> partsOfDay = pill.getPartsOfDay();
+        Hashtable hashtable = new Hashtable();
+        String PARTS_OF_DAY_DIC = "PARTS_OF_DAY_DIC";
+        hashtable.put(PARTS_OF_DAY_DIC, partsOfDay);
+        bundle.putSerializable(PARTS_OF_DAY_DIC, hashtable);
+        return bundle;
+    }
+
 
     /**
      * Creates a new treatment or updates an existing one.
@@ -298,19 +314,6 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
         datePickerDialog.show();
     }
 
-    /**
-     * Puts the fragment for handling parts of the day into the layout.
-     */
-    private void putFragments() {
-        FragmentManager fm = getSupportFragmentManager();
-        mPartOfDayFragment = (PartOfDayFragmentController) fm.findFragmentById(R.id.fragment_container_treatment);
-        if (mPartOfDayFragment == null) {
-            mPartOfDayFragment = new PartOfDayFragmentController();
-            fm.beginTransaction()
-                    .add(R.id.fragment_container_treatment, mPartOfDayFragment)
-                    .commit();
-        }
-    }
 
     /**
      * Called when an item in the spinner is selected.
@@ -325,8 +328,10 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         mActualPill = (Pill) adapterView.getItemAtPosition(i);
         mTVRecommended_duration.setText(getResources().getString(R.string.recommandedDuration) + " " + mActualPill.getDuration() + getResources().getString(R.string.days).toLowerCase());
-        if (mTreatmentToWorkOn == null)
-            mPartOfDayFragment.setCheckBoxState(mActualPill);
+
+        if(mTreatmentToWorkOn == null)
+            mPartOfDayFragment.setCheckBoxState(mActualPill.getPartsOfDay());
+
     }
 
     /**

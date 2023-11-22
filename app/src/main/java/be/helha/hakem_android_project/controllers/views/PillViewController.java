@@ -9,10 +9,19 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+
 import be.helha.hakem_android_project.R;
 import be.helha.hakem_android_project.controllers.fragments.PartOfDayFragmentController;
-import be.helha.hakem_android_project.db.BankPill;
-import be.helha.hakem_android_project.db.ProjectBaseHelper;
+import be.helha.hakem_android_project.db.bank.BankPill;
+import be.helha.hakem_android_project.db.baseHelper.ProjectBaseHelper;
+import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
 
 /**
@@ -41,7 +50,6 @@ public class PillViewController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_pill_activity);
         init();
-        putFragments();
         verifyIntent();
     }
 
@@ -53,6 +61,7 @@ public class PillViewController extends AppCompatActivity {
             mPillToWorkOn = (Pill) getIntent().getSerializableExtra("pill");
         if (mPillToWorkOn != null)
             showPillInformation();
+        initFragments();
     }
 
     /**
@@ -62,19 +71,6 @@ public class PillViewController extends AppCompatActivity {
         mETName.setText(mPillToWorkOn.getName());
         mDuration = mPillToWorkOn.getDuration();
         mTVDuration.setText(String.valueOf(mPillToWorkOn.getDuration()));
-
-        //Because of the fragment commit, we need to wait for the fragment to instantiate its views
-        Thread thread = new Thread(() -> {
-            while (mPartOfDayFragment.checkBoxState()) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            mPartOfDayFragment.setCheckBoxState(mPillToWorkOn);
-        });
-        thread.start();
     }
 
     /**
@@ -93,15 +89,31 @@ public class PillViewController extends AppCompatActivity {
     /**
      * Adds the PartOfDayFragmentController to the fragment container.
      */
-    private void putFragments() {
+    private void initFragments() {
         FragmentManager fm = getSupportFragmentManager();
         mPartOfDayFragment = (PartOfDayFragmentController) fm.findFragmentById(R.id.fragment_container);
         if (mPartOfDayFragment == null) {
-            mPartOfDayFragment = new PartOfDayFragmentController();
-            fm.beginTransaction()
-                    .add(R.id.fragment_container, mPartOfDayFragment)
-                    .commit();
+            if (mPillToWorkOn != null) {
+                mPartOfDayFragment = new PartOfDayFragmentController();
+                fm.beginTransaction()
+                        .add(
+                                R.id.fragment_container,
+                                PartOfDayFragmentController.class,
+                                getBundlePartsOfDay(mPillToWorkOn))
+                        .commit();
+
+            }
         }
+    }
+
+    private Bundle getBundlePartsOfDay(Pill pill) {
+        Bundle bundle = new Bundle();
+        List<PartOfDay> partsOfDay = pill.getPartsOfDay();
+        Hashtable hashtable = new Hashtable();
+        String PARTS_OF_DAY_DIC = "PARTS_OF_DAY_DIC";
+        hashtable.put(PARTS_OF_DAY_DIC, partsOfDay);
+        bundle.putSerializable(PARTS_OF_DAY_DIC, hashtable);
+        return bundle;
     }
 
     /**

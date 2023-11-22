@@ -1,4 +1,4 @@
-package be.helha.hakem_android_project.db;
+package be.helha.hakem_android_project.db.cursorWrapper;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import be.helha.hakem_android_project.db.schema.DBSchema;
 import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
 import be.helha.hakem_android_project.models.Treatment;
