@@ -23,7 +23,6 @@ import be.helha.hakem_android_project.models.Treatment;
  * Only for getting the treatments.
  */
 public class TreatmentsCursorWrapper extends CursorWrapper {
-
     private SQLiteDatabase mDatabase;
 
     /**
@@ -44,6 +43,7 @@ public class TreatmentsCursorWrapper extends CursorWrapper {
      * @throws ParseException If there is an error parsing date strings.
      */
     public List<Treatment> getTreatments() throws ParseException {
+        //Run through the cursor and extract the treatments
         List<Treatment> treatments = new ArrayList<>();
         if (moveToFirst())
             do {
@@ -78,10 +78,8 @@ public class TreatmentsCursorWrapper extends CursorWrapper {
         Pill pill = getSpecificPill(pillId);
         //We have to obtain the parts of day from the database
         List<PartOfDay> partsOfDay = getPartsOfDay(morning, noon, evening);
-
         Calendar beginning = convertStringToCalendar(beginningString);
         Calendar end = convertStringToCalendar(endString);
-
         Treatment treatment = new Treatment(pill, partsOfDay, beginning, end);
         treatment.setId(id);
         return treatment;
@@ -98,9 +96,7 @@ public class TreatmentsCursorWrapper extends CursorWrapper {
                 DBSchema.PillsTable.NAME +
                 " WHERE " + DBSchema.PillsTable.Cols.ID + " = ?";
         String[] args = {String.valueOf(id)};
-
         Cursor cursor = mDatabase.rawQuery(query, args);
-
         Pill pill = extractSpecificPill(cursor);
         cursor.close();
         return pill;
@@ -135,7 +131,6 @@ public class TreatmentsCursorWrapper extends CursorWrapper {
         @SuppressLint("Range") int morning = cursor.getInt(cursor.getColumnIndex(DBSchema.PillsTable.Cols.MORNING));
         @SuppressLint("Range") int noon = cursor.getInt(cursor.getColumnIndex(DBSchema.PillsTable.Cols.NOON));
         @SuppressLint("Range") int evening = cursor.getInt(cursor.getColumnIndex(DBSchema.PillsTable.Cols.EVENING));
-
         List<PartOfDay> partsOfDay = getPartsOfDay(morning, noon, evening);
         return new Pill(pillName, duration, partsOfDay, pillId);
     }

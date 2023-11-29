@@ -11,7 +11,6 @@ import be.helha.hakem_android_project.db.schema.DBSchema;
  * of the SQLite database used in the project.
  */
 public class ProjectBaseHelper extends SQLiteOpenHelper {
-
     private static final int VERSION = 1; // version of the database, used for potential updates
     private static final String DATABASE_NAME = "db_onlypills.db";
 

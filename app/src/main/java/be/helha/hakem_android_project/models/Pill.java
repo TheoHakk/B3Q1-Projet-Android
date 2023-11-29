@@ -8,7 +8,6 @@ import java.util.List;
  * and an optional identifier for the database.
  */
 public class Pill implements Serializable {
-
     private String mName;
     private int mDuration;
     private List<PartOfDay> mPartsOfDay;

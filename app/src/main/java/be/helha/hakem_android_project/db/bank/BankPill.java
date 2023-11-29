@@ -12,7 +12,6 @@ import be.helha.hakem_android_project.models.Pill;
  * Only for the update and insert of the pill.
  */
 public class BankPill {
-
     private SQLiteDatabase mDatabase;
 
     /**

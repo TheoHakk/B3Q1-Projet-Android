@@ -12,7 +12,6 @@ import be.helha.hakem_android_project.models.Treatment;
  * Only for the update and insert of the treatment.
  */
 public class BankTreatment {
-
     private SQLiteDatabase mDatabase;
 
     /**

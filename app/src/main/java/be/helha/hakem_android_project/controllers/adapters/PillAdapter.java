@@ -17,7 +17,6 @@ import be.helha.hakem_android_project.models.Pill;
  * Custom ArrayAdapter for displaying Pills in a Spinner.
  */
 public class PillAdapter extends ArrayAdapter<Pill> {
-
     /**
      * Constructor for the PillAdapter.
      *
@@ -42,15 +41,12 @@ public class PillAdapter extends ArrayAdapter<Pill> {
         // The convertView is the element that will be displayed
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_item, parent, false);
-
         // Get the position, which is equivalent to that of the list
         Pill pill = getItem(position);
-
         // Get the TextView that will display the name of the pill
         TextView textView = convertView.findViewById(android.R.id.text1);
         if (pill != null)
             textView.setText(pill.getName());
-
         return convertView;
     }
 
@@ -68,15 +64,12 @@ public class PillAdapter extends ArrayAdapter<Pill> {
         // The convertView is the element that will be displayed
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
-
         // Get the position, which is equivalent to that of the list
         Pill pill = getItem(position);
-
         // Get the TextView that will display the name of the pill
         TextView textView = convertView.findViewById(android.R.id.text1);
         if (pill != null)
             textView.setText(pill.getName());
-
         return convertView;
     }
 }

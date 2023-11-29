@@ -72,8 +72,6 @@ public class CalendarFragmentController extends Fragment {
      */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // We will now sure that the view is created, and we can use it
-        // Otherwise, we would have a NullPointerException
         super.onViewCreated(view, savedInstanceState);
         updateUI();
     }
@@ -83,10 +81,10 @@ public class CalendarFragmentController extends Fragment {
      */
     public void updateUI() {
         if (mDayOfTreatment != null) {
+            //Showing the date of the day of treatment
             mTVDate.setText(mDayOfTreatment.getDateString());
-
             setTextViewVisibility(mDayOfTreatment);
-
+            //We have to add the name of the pills contained into the treatment to the layout
             for (Treatment t : mDayOfTreatment.getTreatsForMorning())
                 addViewPartsOfDay(t, mLLMorning);
             for (Treatment t : mDayOfTreatment.getTreatsForNoon())
@@ -96,6 +94,11 @@ public class CalendarFragmentController extends Fragment {
         }
     }
 
+    /**
+     * Initializes the fragment.
+     *
+     * @param view The view of the fragment.
+     */
     private void init(View view) {
         mTVDate = view.findViewById(R.id.TV_Date);
         mTVMorning = view.findViewById(R.id.TV_Morning);
@@ -106,21 +109,42 @@ public class CalendarFragmentController extends Fragment {
         mLLEvening = view.findViewById(R.id.LL_Evening);
     }
 
+    /**
+     * Adds a TextView to the layout for the specified pill of the treatment.
+     *
+     * @param t  The Treatment object to be displayed.
+     * @param ll The LinearLayout object representing the layout for the specified part of the day.
+     */
     private void addViewPartsOfDay(Treatment t, LinearLayout ll) {
         TextView tv = new TextView(getContext());
         tv.setText(t.getPill().getName());
+        //If we click on the TextView, we have to show the screen for
+        // the treatment, and we have to pass the treatment to the screen
         tv.setOnClickListener(v -> showTreatmentScreen(t));
         tv.setPadding(150, 0, 0, 0);
         ll.addView(tv);
     }
 
+    /**
+     * Shows the screen for the specified treatment.
+     *
+     * @param treatment The Treatment object for which the screen will be displayed.
+     */
     private void showTreatmentScreen(Treatment treatment) {
         Intent i = new Intent(getContext(), TreatmentViewController.class);
         i.putExtra("treatment", treatment);
         startActivity(i);
     }
 
+    /**
+     * Show or hide the TextViews for the specified day of treatment.
+     * If we have any treatment into the list, we have to show the TextViews otherwise we have to hide them.
+     *
+     * @param dayOfTreatment The DayOfTreatment object for which the visibility of the TextViews will be set.
+     */
     private void setTextViewVisibility(DayOfTreatment dayOfTreatment) {
+        //Control for all parts of day, if we have any treatment into the list,
+        // we have to show the TextViews otherwise we have to hide them
         if (dayOfTreatment.getTreatsForMorning().isEmpty())
             mTVMorning.setVisibility(View.GONE);
         if (dayOfTreatment.getTreatsForNoon().isEmpty())

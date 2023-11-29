@@ -33,6 +33,7 @@ public class PillsCursorWrapper extends CursorWrapper {
      * @return The list of Pill objects extracted from the cursor.
      */
     public List<Pill> getPills() {
+        //Run through the cursor and extract the pills
         List<Pill> pills = new ArrayList<>();
         if (moveToFirst())
             do {
@@ -51,6 +52,7 @@ public class PillsCursorWrapper extends CursorWrapper {
      */
     @NonNull
     private Pill getPillFromCursor(Cursor cursor) {
+        //Extract the data from the cursor
         int pillId = cursor.getInt(cursor.getColumnIndexOrThrow(DBSchema.PillsTable.Cols.ID));
         String pillName = cursor.getString(cursor.getColumnIndexOrThrow(DBSchema.PillsTable.Cols.NAME));
         int duration = cursor.getInt(cursor.getColumnIndexOrThrow(DBSchema.PillsTable.Cols.DURATION));
@@ -72,6 +74,7 @@ public class PillsCursorWrapper extends CursorWrapper {
      * @return The list of PartOfDay enum based on the input values.
      */
     private List<PartOfDay> getPartsOfDay(int morning, int noon, int evening) {
+        //Convert the integer values to PartOfDay enum values
         List<PartOfDay> partsOfDay = new ArrayList<>();
         if (morning == 1) partsOfDay.add(PartOfDay.MORNING);
         if (noon == 1) partsOfDay.add(PartOfDay.NOON);

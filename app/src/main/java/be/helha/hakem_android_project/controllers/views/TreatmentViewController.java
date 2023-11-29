@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -26,7 +25,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Objects;
 
 import be.helha.hakem_android_project.R;
 import be.helha.hakem_android_project.controllers.adapters.PillAdapter;
@@ -35,7 +33,6 @@ import be.helha.hakem_android_project.db.bank.BankTreatment;
 import be.helha.hakem_android_project.db.schema.DBSchema;
 import be.helha.hakem_android_project.db.cursorWrapper.PillsCursorWrapper;
 import be.helha.hakem_android_project.db.baseHelper.ProjectBaseHelper;
-import be.helha.hakem_android_project.models.PartOfDay;
 import be.helha.hakem_android_project.models.Pill;
 import be.helha.hakem_android_project.models.Treatment;
 
@@ -54,8 +51,7 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
     private Pill mActualPill;
     private Calendar mBeginning;
     private Calendar mEnd;
-    private Treatment mTreatmentToWorkOn;
-
+    private Treatment mTransmittedTreatment;
 
     /**
      * Called when the activity is starting. This is where most initialization should go.
@@ -87,6 +83,7 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
     private void init() {
         initializeView();
         verifyIntent();
+        showTreatmentInformation();
         initFragments();
         initializePills();
         setActions();
@@ -97,9 +94,7 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
      */
     private void verifyIntent() {
         if (getIntent().getExtras() != null)
-            mTreatmentToWorkOn = (Treatment) getIntent().getSerializableExtra("treatment");
-        if (mTreatmentToWorkOn != null)
-            showTreatmentInformation();
+            mTransmittedTreatment = (Treatment) getIntent().getSerializableExtra("treatment");
     }
 
     /**
@@ -107,13 +102,15 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
      */
     @SuppressLint("SetTextI18n")
     private void showTreatmentInformation() {
-        mBeginning = mTreatmentToWorkOn.getBeginning();
-        mEnd = mTreatmentToWorkOn.getEnd();
-        mActualPill = mTreatmentToWorkOn.getPill();
-        mTVBeginningDate.setText(mBeginning.get(Calendar.DAY_OF_MONTH) + "/" + (mBeginning.get(Calendar.MONTH) + 1) + "/" + mBeginning.get(Calendar.YEAR));
-        mTVEndDate.setText(mEnd.get(Calendar.DAY_OF_MONTH) + "/" + (mEnd.get(Calendar.MONTH) + 1) + "/" + mEnd.get(Calendar.YEAR));
-        mTVRecommended_duration.setText(getResources().getString(R.string.recommandedDuration) + " " + mActualPill.getDuration() + " @string/days");
-        mSPillSpinner.setSelection(mActualPill.getId() - 1);
+        if (mTransmittedTreatment != null) {
+            mBeginning = mTransmittedTreatment.getBeginning();
+            mEnd = mTransmittedTreatment.getEnd();
+            mActualPill = mTransmittedTreatment.getPill();
+            mTVBeginningDate.setText(mBeginning.get(Calendar.DAY_OF_MONTH) + "/" + (mBeginning.get(Calendar.MONTH) + 1) + "/" + mBeginning.get(Calendar.YEAR));
+            mTVEndDate.setText(mEnd.get(Calendar.DAY_OF_MONTH) + "/" + (mEnd.get(Calendar.MONTH) + 1) + "/" + mEnd.get(Calendar.YEAR));
+            mTVRecommended_duration.setText(getResources().getString(R.string.recommandedDuration) + " " + mActualPill.getDuration() + " @string/days");
+            mSPillSpinner.setSelection(mActualPill.getId() - 1);
+        }
     }
 
     /**
@@ -121,38 +118,55 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
      */
     private void initFragments() {
         FragmentManager fragmentManager = getSupportFragmentManager();
+        //Get the fragment if it exists
         mPartOfDayFragment = (PartOfDayFragmentController) fragmentManager.findFragmentById(R.id.fragment_container_treatment);
         if (mPartOfDayFragment == null) {
+            //If the fragment doesn't exist, we have to create it
             mPartOfDayFragment = new PartOfDayFragmentController();
-            fragmentManager.beginTransaction().add(R.id.fragment_container_treatment, mPartOfDayFragment).commit();
+            //Then we have to add it to the container
+            fragmentManager
+                    .beginTransaction()
+                    .add(R.id.fragment_container_treatment, mPartOfDayFragment)
+                    .commit();
         }
-        if (mTreatmentToWorkOn != null) {
-            mPartOfDayFragment.setArguments(getBundlePill(mTreatmentToWorkOn.getPill()));
-        }
+        if (mTransmittedTreatment != null)
+            //If the transmitted treatment is not null, we have to pass the list of parts of the day to the fragment
+            mPartOfDayFragment.setArguments(getBundlePill(mTransmittedTreatment.getPill()));
     }
 
+    /**
+     * Gets the bundle for the parts of the day.
+     *
+     * @param pill The pill to get the parts of the day from.
+     * @return The bundle for the parts of the day.
+     */
     private Bundle getBundlePill(Pill pill) {
+        //We have to use a bundle to pass the list of parts of the day to the fragment
         Bundle bundle = new Bundle();
+        //We will use a hashtable to pass the list of parts of the day
+        //Hashtable is used because it implements Serializable
         Hashtable hashtable = new Hashtable();
         hashtable.put("PARTS_OF_DAY_DIC", pill.getPartsOfDay());
         bundle.putSerializable("PARTS_OF_DAY_DIC", hashtable);
         return bundle;
     }
 
-
     /**
      * Creates a new treatment or updates an existing one.
      */
     private void createNewTreatment() {
+        //Get the current treatment obtained from the view's fields
         Treatment treatmentToInsert = getCurrentTreatment();
         if (treatmentToInsert != null) {
-            if (mTreatmentToWorkOn != null)
+            //if we obtained a treatment from the calendar, we can update it into the database
+            //otherwise, we will insert it
+            if (mTransmittedTreatment != null)
                 updateTreatment(treatmentToInsert);
             else
                 insertNewTreatment(treatmentToInsert);
+            //close the activity
             finish();
-        } else
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.noEmptyField), Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -161,15 +175,16 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
      * @param actualTreatmentSettings The updated treatment settings.
      */
     private void updateTreatment(Treatment actualTreatmentSettings) {
+        //We have to update the treatment in the database
         ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
         BankTreatment bankTreatment = new BankTreatment(projectBaseHelper.getWritableDatabase());
-
-        mTreatmentToWorkOn.setBeginning(actualTreatmentSettings.getBeginning());
-        mTreatmentToWorkOn.setEnd(actualTreatmentSettings.getEnd());
-        mTreatmentToWorkOn.setPartsOfDay(actualTreatmentSettings.getPartsOfDay());
-        mTreatmentToWorkOn.setPill(actualTreatmentSettings.getPill());
-
-        bankTreatment.updateTreatment(mTreatmentToWorkOn);
+        //we get the settings of the actual treatment obtained from the view, and set them to the transmitted treatment
+        mTransmittedTreatment.setBeginning(actualTreatmentSettings.getBeginning());
+        mTransmittedTreatment.setEnd(actualTreatmentSettings.getEnd());
+        mTransmittedTreatment.setPartsOfDay(actualTreatmentSettings.getPartsOfDay());
+        mTransmittedTreatment.setPill(actualTreatmentSettings.getPill());
+        //Then we update the treatment in the database
+        bankTreatment.updateTreatment(mTransmittedTreatment);
     }
 
     /**
@@ -180,21 +195,35 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
     private Treatment getCurrentTreatment() {
         Treatment treatmentToInsert = null;
         try {
-            Pill actualPill = (Pill) mSPillSpinner.getSelectedItem();
-            List<PartOfDay> partsOfDay = mPartOfDayFragment.getPartsOfDay();
-            Calendar beginning = this.mBeginning;
-            Calendar end = this.mEnd;
-            if (actualPill != null
-                    && partsOfDay != null
-                    && beginning != null
-                    && end != null
-                    && end.after(beginning)
-                    && !partsOfDay.isEmpty())
-                treatmentToInsert = new Treatment(actualPill, partsOfDay, beginning, end);
+            //Verify if the fields are valid
+            verifyFields();
+            treatmentToInsert = new Treatment(
+                    (Pill) mSPillSpinner.getSelectedItem(),
+                    mPartOfDayFragment.getPartsOfDay(),
+                    mBeginning,
+                    mEnd);
         } catch (Exception e) {
-            Log.i("Error ", Objects.requireNonNull(e.getMessage()));
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         return treatmentToInsert;
+    }
+
+    /**
+     * Verifies that all fields are filled.
+     *
+     * @throws IllegalArgumentException If any field is empty.
+     */
+    private void verifyFields() {
+        if ((Pill) mSPillSpinner.getSelectedItem() == null)
+            throw new IllegalArgumentException(getResources().getString(R.string.errorNoPillSelected));
+        if (mPartOfDayFragment.getPartsOfDay().isEmpty())
+            throw new IllegalArgumentException(getResources().getString(R.string.errorNoPartOfDaySelected));
+        if (mBeginning == null)
+            throw new IllegalArgumentException(getResources().getString(R.string.errorNoBeginningDateSelected));
+        if (mEnd == null)
+            throw new IllegalArgumentException(getResources().getString(R.string.errorNoEndDateSelected));
+        if (mBeginning.after(mEnd))
+            throw new IllegalArgumentException(getResources().getString(R.string.errorBeginDateAfterEnd));
     }
 
     /**
@@ -203,8 +232,10 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
      * @param currentTreatment The treatment to be inserted.
      */
     private void insertNewTreatment(Treatment currentTreatment) {
+        //Open the database
         ProjectBaseHelper projectBaseHelper = new ProjectBaseHelper(this);
         BankTreatment bankTreatment = new BankTreatment(projectBaseHelper.getWritableDatabase());
+        //Insert the treatment into the database
         bankTreatment.insertTreatment(currentTreatment);
     }
 
@@ -217,13 +248,10 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
         mTVBeginningDate = findViewById(R.id.TV_begin_date);
         mTVEndDate = findViewById(R.id.TV_end_date);
         mTVRecommended_duration = findViewById(R.id.TV_recommanded_duration);
-
         mFABAddPill = findViewById(R.id.B_add_pill);
         mFABModifyPill = findViewById(R.id.B_modify_pill);
         mBTreatmentValidation = findViewById(R.id.B_treatment_validate);
-
         mSPillSpinner = findViewById(R.id.SP_pills_items);
-
         mBeginning = null;
         mEnd = null;
     }
@@ -233,16 +261,16 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
      */
     private void initializePills() {
         mProjectBaseHelper = new ProjectBaseHelper(this);
-
         SQLiteDatabase db = mProjectBaseHelper.getReadableDatabase();
+        //Get all the pills from the database
+        //We will use a cursor to get the pills, based on Select * from pills
         Cursor cursor = db.rawQuery("SELECT * FROM " + DBSchema.PillsTable.NAME, null);
-
         PillsCursorWrapper pillsCursorWrapper = new PillsCursorWrapper(cursor);
         List<Pill> pills = pillsCursorWrapper.getPills();
-
+        //We will set the adapter for the spinner
+        //I've create a custom adapter for the spinner, because we have to display the name of the pill, and not the toString method
         PillAdapter adapter = new PillAdapter(this, pills);
         mSPillSpinner.setAdapter(adapter);
-
         mSPillSpinner.setOnItemSelectedListener(this);
     }
 
@@ -274,38 +302,27 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
      * @param sender A string indicating whether the date picker is for the beginning or end date.
      */
     private void showDatePickerDialog(String sender) {
+        //Because I want to use the same view as seen in the mockups, I have to use a DatePickerDialog
         Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        //If I click on the button for the beginning date, I open the DatePickerDialog for the beginning date
+        //If I click on the button for the end date, I open the DatePickerDialog for the end date
         @SuppressLint("SetTextI18n") DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDay) -> {
             if (sender.equals("end")) {
-                try {
-                    if (mBeginning != null) {
-                        Calendar endCalendar = Calendar.getInstance();
-                        endCalendar.set(selectedYear, selectedMonth, selectedDay);
-                        mEnd = endCalendar;
-                        if (mEnd.before(mBeginning) || mEnd.equals(mBeginning)) {
-                            mEnd = null;
-                            throw new Exception(getResources().getString(R.string.errorBeginDateAfterEnd));
-                        } else
-                            mTVEndDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // add 1 to selectedMonth because it starts at 0.
-                    }
-                } catch (Exception e) {
-                    mTVEndDate.setText(getResources().getString(R.string.dateError));
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.errorBeginDateAfterEnd), Toast.LENGTH_SHORT).show();
-                }
-            } else if (sender.equals("beginning")) {
+                Calendar endCalendar = Calendar.getInstance();
+                endCalendar.set(selectedYear, selectedMonth, selectedDay);
+                mEnd = endCalendar;
+                //I have to add 1 to the selectedMonth because it starts at 0
+                mTVEndDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // add 1 to selectedMonth because it starts at 0.
+            } else {
                 Calendar beginningCalendar = Calendar.getInstance();
                 beginningCalendar.set(selectedYear, selectedMonth, selectedDay);
                 mBeginning = beginningCalendar;
-
+                //I have to add 1 to the selectedMonth because it starts at 0
                 mTVBeginningDate.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear); // Add 1 to selectedMonth because it starts at 0.
             }
-        }, year, month, day);
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
     }
-
 
     /**
      * Called when an item in the spinner is selected.
@@ -319,16 +336,14 @@ public class TreatmentViewController extends AppCompatActivity implements Adapte
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         mActualPill = (Pill) adapterView.getItemAtPosition(i);
-        mTVRecommended_duration.setText(getResources().getString(R.string.recommandedDuration) + " " + mActualPill.getDuration() + getResources().getString(R.string.days).toLowerCase());
-
-        //Replace the fragment with the new parts of the day
+        mTVRecommended_duration.setText(getResources().getString(R.string.recommandedDuration) + " " + mActualPill.getDuration() + " " + getResources().getString(R.string.days).toLowerCase());
+        //We have to update the fragment with the new pill
         FragmentManager fragmentManager = getSupportFragmentManager();
+        //Get the fragment if it exists
         mPartOfDayFragment = (PartOfDayFragmentController) fragmentManager.findFragmentById(R.id.fragment_container_treatment);
-        if (mPartOfDayFragment != null) {
+        if (mPartOfDayFragment != null)
             mPartOfDayFragment.setCheckBoxState(mActualPill.getPartsOfDay());
-        }
     }
-
 
     /**
      * Called when nothing is selected in the spinner.

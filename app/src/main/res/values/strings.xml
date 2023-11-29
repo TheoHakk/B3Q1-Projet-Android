@@ -1,13 +1,11 @@
 <resources>
     <string name="appName">OnlyPills</string>
-    <string name="titleTreatmentScreen">Ajout d\'un traitement</string>
-    <string name="titlePillScreen">Ajout d\'un médicament</string>
     <string name="pillsCalendar">Calendrier des médicaments</string>
     <string name="addTreatment">Ajouter un traitement</string>
-    <string name="addPill">Ajout d\'un médicament</string>
-    <string name="defaultDate">17 octobre 2023</string>
-    <string name="defaultPartDay">Midi</string>
+    <string name="addPill">Ajouter un médicament</string>
     <string name="calendarEmoji">📅</string>
+    <string name="arrowUp">⬆️</string>
+    <string name="arrowDown">⬇️</string>
     <string name="end">Fin</string>
     <string name="date">Date</string>
     <string name="morning">Matin</string>
@@ -17,18 +15,22 @@
     <string name="defaultDuration">Durée par défaut</string>
     <string name="pillName">Nom du médicament</string>
     <string name="validate">Valider</string>
-    <string name="arrowUp">⬆️</string>
-    <string name="arrowDown">⬇️</string>
     <string name="days">Jours</string>
     <string name="pill">Médicament</string>
     <string name="recommandedDuration">Durée recommandée :</string>
     <string name="noEmptyField">Veuillez remplir tous les champs</string>
-    <string name="errorBeginDateAfterEnd">La date de fin ne peut pas être avant la date de début, et doit respecter la durée du traitement</string>
-    <string name="dateError">Erreur date</string>
-    <string name="descriptionFABAddTreatment">add a treatment</string>
-    <string name="descrFABAddPill">add a pill</string>
+    <string name="errorBeginDateAfterEnd">La date de fin ne peut pas être avant la date de début.</string>
+    <string name="descriptionFABAddTreatment">ajouter une traitement</string>
+    <string name="descrFABAddPill">ajouter un médicament</string>
     <string name="dates">Dates</string>
     <string name="beginning">Début</string>
-    <string name="descrFABModifyPill">modify a pill</string>
+    <string name="descrFABModifyPill">Modifier un médicament</string>
     <string name="zero">0</string>
+    <string name="errorNoPillSelected">Aucun médicament n\'a été sélectionné</string>
+    <string name="errorNoPartOfDaySelected">Vous devez cocher une des cases</string>
+    <string name="errorNoBeginningDateSelected">Vous devez initialiser une date de début\n</string>
+    <string name="errorNoEndDateSelected">Vous devez sélectionner une date de fin</string>
+    <string name="internError">Erreur interne\n</string>
+    <string name="emptyName">Nom du médicament vide</string>
+    <string name="durationZero">La durée doit être strictement supérieure à zéro</string>
 </resources>

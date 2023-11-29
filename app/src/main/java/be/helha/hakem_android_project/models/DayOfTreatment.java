@@ -17,10 +17,10 @@ public class DayOfTreatment {
     /**
      * Constructs a new instance of the DayOfTreatment class.
      *
-     * @param mDate The date for the day of treatment.
+     * @param date The date for the day of treatment.
      */
-    public DayOfTreatment(Calendar mDate) {
-        this.mDate = mDate;
+    public DayOfTreatment(Calendar date) {
+        mDate = date;
         mTreatsForMorning = new ArrayList<>();
         mTreatsForNoon = new ArrayList<>();
         mTreatsForEvening = new ArrayList<>();
@@ -105,6 +105,8 @@ public class DayOfTreatment {
      * @return The formatted date string.
      */
     public String getDateString() {
+        //Convert the date to a string in the format "dd/MM/yyyy"
+        //We add 1 to the month because the Calendar class starts at 0 for the month
         int day = mDate.get(Calendar.DAY_OF_MONTH);
         int month = mDate.get(Calendar.MONTH) + 1; //We add 1 for getting the real month
         int year = mDate.get(Calendar.YEAR);

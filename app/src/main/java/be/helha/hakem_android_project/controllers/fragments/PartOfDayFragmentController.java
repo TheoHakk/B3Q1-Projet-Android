@@ -1,7 +1,6 @@
 package be.helha.hakem_android_project.controllers.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +19,9 @@ import be.helha.hakem_android_project.models.PartOfDay;
  * The PartOfDayFragmentController class represents a fragment for selecting parts of the day using checkboxes.
  */
 public class PartOfDayFragmentController extends Fragment {
-
     private CheckBox mMorning;
     private CheckBox mNoon;
     private CheckBox mEvening;
-
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -43,17 +40,29 @@ public class PartOfDayFragmentController extends Fragment {
         return view;
     }
 
+    /**
+     * Gets the arguments passed to the fragment.
+     */
     private void getArgs() {
+        //Obtain the bundle of arguments passed to the fragment
         Bundle bundle = getArguments();
         if (bundle != null) {
+            //Using a hashtable to get the list of parts of the day
+            //Hashtable is used because it implements Serializable
             Hashtable hashtable = (Hashtable) bundle.getSerializable("PARTS_OF_DAY_DIC");
             if (hashtable != null) {
+                //If we have a hashtable, we can get the list of parts of the day, and checking the boxes
                 List<PartOfDay> partsOfDay = (List<PartOfDay>) hashtable.get("PARTS_OF_DAY_DIC");
                 setCheckBoxState(partsOfDay);
             }
         }
     }
 
+    /**
+     * Initializes the fragment.
+     *
+     * @param view The view of the fragment.
+     */
     private void init(View view) {
         mMorning = view.findViewById(R.id.CB_morning);
         mNoon = view.findViewById(R.id.CB_noon);
@@ -74,6 +83,8 @@ public class PartOfDayFragmentController extends Fragment {
      * @return A list of selected parts of the day.
      */
     public List<PartOfDay> getPartsOfDay() {
+        //Looking for the selected parts of the day
+        //If a checkbox is checked, we add the corresponding part of the day to the list
         List<PartOfDay> partsOfDay = new ArrayList<>();
         if (mMorning.isChecked())
             partsOfDay.add(PartOfDay.MORNING);
@@ -94,7 +105,7 @@ public class PartOfDayFragmentController extends Fragment {
         mMorning.setChecked(false);
         mNoon.setChecked(false);
         mEvening.setChecked(false);
-
+        // Check checkboxes based on the provided list
         if (partsOfDay != null && !partsOfDay.isEmpty())
             // If partsOfDay is not null and not empty, set checkbox state based on the provided list
             for (PartOfDay partOfDay : partsOfDay)

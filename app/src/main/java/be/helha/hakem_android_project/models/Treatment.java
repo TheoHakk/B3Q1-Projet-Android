@@ -9,7 +9,6 @@ import java.util.List;
  * and the beginning and end dates of the treatment. Also we have the id for the database.
  */
 public class Treatment implements Serializable {
-
     private int mId;
     private Pill mPill;
     private List<PartOfDay> mPartsOfDay;
@@ -127,6 +126,8 @@ public class Treatment implements Serializable {
      * @return The formatted beginning date string.
      */
     public String getBeginningString() {
+        // We convert the date to a string in the format "dd/MM/yyyy"
+        // We add 1 to the month because the Calendar class starts counting months from 0
         int day = mBeginning.get(Calendar.DAY_OF_MONTH);
         int month = mBeginning.get(Calendar.MONTH) + 1; // We add 1 for getting the real month
         int year = mBeginning.get(Calendar.YEAR);
@@ -139,6 +140,8 @@ public class Treatment implements Serializable {
      * @return The formatted end date string.
      */
     public String getEndString() {
+        // We convert the date to a string in the format "dd/MM/yyyy"
+        // We add 1 to the month because the Calendar class starts counting months from 0
         int day = mEnd.get(Calendar.DAY_OF_MONTH);
         int month = mEnd.get(Calendar.MONTH) + 1;
         int year = mEnd.get(Calendar.YEAR);
@@ -152,6 +155,7 @@ public class Treatment implements Serializable {
      * @return true if the date is within the range, false otherwise.
      */
     public boolean containsTheDate(Calendar date) {
+        // We check if the date is within the range of the treatment
         return date.getTime().compareTo(mBeginning.getTime()) > 0 && date.getTime().compareTo(mEnd.getTime()) <= 0;
     }
 }
